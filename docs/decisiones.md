@@ -23,3 +23,4 @@
 | 2026-11-23 | La web informa la anticipación (2 días; eventos, 1 semana) desde `src/data.js`; no la valida | Pulido con Impeccable (borrador): el cliente no tenía cómo saberlo |
 | 2026-11-23 | En Eventos, los menús por persona se separan de los paquetes según el formato "Por persona" | El precio por persona se leía como total |
 | 2026-11-23 | "Vaciar pedido" pide un segundo toque; "Copiar mensaje" pasa a enlace secundario | Se perdía el pedido con un toque y competía con "Confirmar" |
+| 2026-11-23 | El pedido pide fecha y exige la anticipación (2 días; 1 semana si incluye un evento), contada en hora de Chile | Pedido del usuario; el Chef tenía que preguntar la fecha |

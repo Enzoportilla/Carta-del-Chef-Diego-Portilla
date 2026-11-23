@@ -48,7 +48,7 @@ test('teléfono chileno a formato internacional', () => {
   for (const t of ['', undefined, '123', 'abc', '+54 9 1234 5678', '9123456789']) assert.equal(cart.telefonoInternacional(t), null)
 })
 
-const datos = { entrega: 'delivery', nombre: ' Ana ', apellido: ' Pérez ', telefono: '9 1234 5678', direccion: 'Los Aromos 12', comuna: 'Ñuñoa', referencias: 'portón negro', comentario: '  ' }
+const datos = { fecha: '2026-11-28', entrega: 'delivery', nombre: ' Ana ', apellido: ' Pérez ', telefono: '9 1234 5678', direccion: 'Los Aromos 12', comuna: 'Ñuñoa', referencias: 'portón negro', comentario: '  ' }
 const res = cart.resumen?.({ 'pan-arabe': 2 }, [p('pan-arabe', 2000, 5, 'Pan árabe', '5 unidades de 70 g')])
 
 test('mensaje de delivery lleva detalle, total, entrega, pago y teléfono', () => {
@@ -57,6 +57,7 @@ test('mensaje de delivery lleva detalle, total, entrega, pago y teléfono', () =
   assert.match(msg, /- 2 × Pan árabe \(5 unidades de 70 g\): \$\s?4\.000/)
   assert.match(msg, /Total: \$\s?4\.000/)
   assert.match(msg, /Entrega: delivery a Los Aromos 12, Ñuñoa \(portón negro\)/)
+  assert.match(msg, /Fecha: sábado 28 de noviembre de 2026/)
   assert.match(msg, /Pago: transferencia bancaria/)
   assert.match(msg, /Teléfono: \+56912345678/)
   assert.doesNotMatch(msg, /Comentario|undefined|null|envío|cuesta/)
@@ -64,9 +65,25 @@ test('mensaje de delivery lleva detalle, total, entrega, pago y teléfono', () =
 
 test('mensaje de retiro no incluye la dirección guardada', () => {
   const msg = cart.mensajePedido(res, { ...datos, entrega: 'retiro', comentario: 'sin sal' })
-  assert.match(msg, /Entrega: retiro/)
+  assert.match(msg, /Entrega: retiro\. ¿A qué hora puedo pasar\?/)
   assert.doesNotMatch(msg, /Los Aromos|portón/)
   assert.match(msg, /Comentario: sin sal/)
+})
+
+test('fecha mínima: días desde hoy en Chile, cruzando mes y medianoche UTC', () => {
+  assert.equal(cart.fechaDesde(2, new Date('2026-11-23T15:00:00Z')), '2026-11-25')
+  assert.equal(cart.fechaDesde(2, new Date('2026-11-24T02:30:00Z')), '2026-11-25') // en Chile aún es 23
+  assert.equal(cart.fechaDesde(7, new Date('2026-12-28T15:00:00Z')), '2027-01-04')
+})
+
+test('fecha en texto no se corre de día', () => {
+  assert.match(cart.fechaTexto('2026-11-28'), /^sábado 28 de noviembre de 2026$/)
+})
+
+test('anticipación según el pedido: manda la de eventos', () => {
+  const linea = (categoria) => ({ producto: { categoria } })
+  assert.equal(cart.anticipacion([linea('panes')]).dias, 2)
+  assert.equal(cart.anticipacion([linea('panes'), linea('eventos')]).dias, 7)
 })
 
 test('enlace de WhatsApp codifica el mensaje completo', () => {

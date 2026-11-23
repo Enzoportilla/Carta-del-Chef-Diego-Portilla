@@ -16,7 +16,7 @@ Un panel de administración permite al chef gestionar productos y stock.
    - Resumen con subtotal y total.
 3. **Checkout por WhatsApp**
    - Elegir **delivery** (dirección, comuna, referencias) o **retiro**; el pago y la entrega se coordinan por WhatsApp, sin mostrar costos de envío.
-   - Datos del cliente: nombre, apellido y teléfono.
+   - Datos del cliente: fecha (2 días de anticipación; eventos, 1 semana), nombre, apellido y teléfono.
    - Pago por **transferencia bancaria**: mostrar datos de transferencia al confirmar.
    - Generar un mensaje de pedido ordenado y abrir `https://wa.me/<numero>?text=<mensaje>`.
 4. **Panel de administración**

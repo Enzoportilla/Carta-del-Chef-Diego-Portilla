@@ -16,7 +16,7 @@ web
 
 ## Product Purpose
 
-Carta en línea para los productos del Chef Diego Portilla: el cliente recorre las categorías, arma un pedido y lo envía por WhatsApp. Hay éxito cuando el mensaje llega completo (productos, cantidades, total, retiro o delivery, nombre, apellido y teléfono) y el chef puede coordinar sin volver a preguntar lo básico.
+Carta en línea para los productos del Chef Diego Portilla: el cliente recorre las categorías, arma un pedido y lo envía por WhatsApp. Hay éxito cuando el mensaje llega completo (productos, cantidades, total, retiro o delivery, fecha, nombre, apellido y teléfono) y el chef puede coordinar sin volver a preguntar lo básico.
 
 ## Positioning
 
@@ -26,7 +26,7 @@ Un chef que prepara por encargo, tanto para el día a día como para eventos, co
 
 - El pedido se confirma en dos pasos: "Confirmar pedido" revisa datos, stock y precios; después "Enviar por WhatsApp" abre el chat con el mensaje escrito. No se guarda ni descuenta stock: llega al chef solo cuando el cliente lo envía.
 - El pago (transferencia bancaria) y la entrega se coordinan con el chef en la conversación. La web no muestra costos de envío.
-- Los pedidos requieren **2 días de anticipación; los eventos, 1 semana**. La web lo informa (`src/data.js`) pero no lo valida.
+- Los pedidos requieren **2 días de anticipación; los eventos, 1 semana**. El pedido exige una fecha que respete ese plazo (`src/data.js`).
 - El chef ajusta stock a mano en el panel; no baja solo con cada pedido.
 - Carta publicada en GitHub Pages; productos, sesión y fotos en Supabase. Ver `docs/publicacion.md`.
 

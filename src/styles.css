@@ -171,6 +171,9 @@ html:has(dialog[open]) { overflow: hidden; }
 .campo { display: grid; gap: .3rem; min-width: 0; }
 .campos-dos { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
 .campo :is(input, textarea, select) { width: 100%; min-height: 3rem; padding: .6rem .85rem; border: 1px solid var(--borde-campo); border-radius: 12px; background: #fff; resize: vertical; }
+/* iOS le da ancho y alineación propios a las fechas */
+.campo input[type='date'] { appearance: none; text-align: left; }
+.campo ::-webkit-date-and-time-value { text-align: left; }
 .campo ::placeholder { color: #767065; }
 .enviar { display: grid; place-items: center; min-height: 3.5rem; border: 0; border-radius: 999px; background: var(--dorado); color: var(--noche); font-weight: 700; font-size: 1.0625rem; text-decoration: none; }
 /* verde de WhatsApp oscurecido y letra de 19 px: sobre #25d366 el blanco no se alcanza a leer (2:1) */

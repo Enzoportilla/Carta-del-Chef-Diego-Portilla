@@ -153,7 +153,7 @@ export default function App() {
       <header className="portada">
         <h1><img src={`${import.meta.env.BASE_URL}img/logo-chef-diego-portilla.png`} alt={NEGOCIO.nombre} width="641" height="394" /></h1>
         <p>Panes, dulces y masas hechos por el chef.</p>
-        <p>Arma tu pedido y envíalo por WhatsApp, con {NEGOCIO.anticipacion.carta} de anticipación.</p>
+        <p>Arma tu pedido y envíalo por WhatsApp, con {NEGOCIO.anticipacion.carta.texto} de anticipación.</p>
       </header>
 
       {categorias.length > 0 ? <Cordillera categorias={categorias} activa={activa} /> : (
@@ -174,7 +174,7 @@ export default function App() {
             <h2 id={`${c.id}-titulo`}>{c.nombre}</h2>
             {c.id === 'eventos' ? (
               <>
-                <p className="nota">Pide tu evento con {NEGOCIO.anticipacion.eventos} de anticipación.</p>
+                <p className="nota">Pide tu evento con {NEGOCIO.anticipacion.eventos.texto} de anticipación.</p>
                 {[['Menús por persona', esMenu], ['Paquetes', (p) => !esMenu(p)]].map(([titulo, entra]) => {
                   const grupo = productos.filter((p) => p.categoria === c.id && entra(p))
                   return grupo.length > 0 && (
@@ -193,7 +193,7 @@ export default function App() {
       {(NEGOCIO.retiro || NEGOCIO.whatsapp) && (
         <footer className="pie">
           {NEGOCIO.retiro && <p>Retiro: {NEGOCIO.retiro}</p>}
-          <p>Pide con {NEGOCIO.anticipacion.carta} de anticipación; eventos, con {NEGOCIO.anticipacion.eventos}. {COORDINAR}</p>
+          <p>Pide con {NEGOCIO.anticipacion.carta.texto} de anticipación; eventos, con {NEGOCIO.anticipacion.eventos.texto}. {COORDINAR}</p>
           {NEGOCIO.whatsapp && <p><a href={`https://wa.me/${NEGOCIO.whatsapp}`}>Escribir al Chef por WhatsApp</a></p>}
         </footer>
       )}

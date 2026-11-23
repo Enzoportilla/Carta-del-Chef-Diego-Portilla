@@ -1,17 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 import { COORDINAR, NEGOCIO, TRANSFERENCIA } from './data.js'
-import { enlaceWhatsApp, mensajePedido, precio, resumen, telefonoInternacional } from './cart.js'
+import { anticipacion, enlaceWhatsApp, fechaDesde, fechaTexto, mensajePedido, precio, resumen, telefonoInternacional } from './cart.js'
 import { guardar, leer } from './almacen.js'
 import Paso from './Paso.jsx'
 
 const CLAVE = 'chef-diego-pedido-datos'
-const VACIO = { entrega: 'retiro', nombre: '', apellido: '', telefono: '', direccion: '', comuna: '', referencias: '', comentario: '' }
+const VACIO = { fecha: '', entrega: 'retiro', nombre: '', apellido: '', telefono: '', direccion: '', comuna: '', referencias: '', comentario: '' }
 
 function leerDatos() {
   const previo = leer(CLAVE) ?? {}
   const datos = { ...VACIO }
   for (const k in VACIO) if (typeof previo[k] === 'string') datos[k] = previo[k]
   if (datos.entrega !== 'delivery') datos.entrega = 'retiro'
+  datos.fecha = '' // cada pedido elige la suya
   return datos
 }
 
@@ -86,6 +87,8 @@ export default function Pedido({ abierto, onCerrar, res, ajuste, carrito, onCamb
   const campo = (k) => ({ value: datos[k], onChange: (e) => setDatos({ ...datos, [k]: e.target.value }) })
   const texto = (k) => ({ ...campo(k), required: true, pattern: '.*\\S.*', title: 'Completa este campo' })
   const mensaje = mensajePedido(res, datos)
+  const plazo = anticipacion(res.lineas)
+  const primera = fechaDesde(plazo.dias)
 
   const confirmar = async (e) => {
     e.preventDefault()
@@ -153,6 +156,12 @@ export default function Pedido({ abierto, onCerrar, res, ajuste, carrito, onCamb
                   </>
                 ) : NEGOCIO.retiro && <p className="nota">{NEGOCIO.retiro}</p>}
 
+                <label className="campo"><span>¿Para cuándo lo necesitas?</span>
+                  <input type="date" required min={primera} max={fechaDesde(365)} {...campo('fecha')}
+                    ref={(el) => el?.setCustomValidity(datos.fecha && datos.fecha < primera ? `Elige una fecha desde el ${fechaTexto(primera)}.` : '')} />
+                  <small className="nota">Con {plazo.texto} de anticipación: desde el {fechaTexto(primera)}.</small>
+                </label>
+
                 <div className="campos-dos">
                   <label className="campo"><span>Nombre</span><input autoComplete="given-name" {...texto('nombre')} /></label>
                   <label className="campo"><span>Apellido</span><input autoComplete="family-name" {...texto('apellido')} /></label>
@@ -163,9 +172,7 @@ export default function Pedido({ abierto, onCerrar, res, ajuste, carrito, onCamb
                 </label>
                 <label className="campo"><span>Comentario (opcional)</span><textarea rows={2} {...campo('comentario')} /></label>
 
-                <p className="nota">
-                  Pide con {NEGOCIO.anticipacion.carta} de anticipación{res.lineas.some((l) => l.producto.categoria === 'eventos') && `; eventos, con ${NEGOCIO.anticipacion.eventos}`}. {COORDINAR}
-                </p>
+                <p className="nota">{COORDINAR}</p>
                 <p className="aviso" role="status">{aviso}</p>
                 <button type="submit" className="enviar" disabled={!NEGOCIO.whatsapp || enviando}>{enviando ? 'Confirmando stock…' : 'Confirmar pedido'}</button>
                 {!NEGOCIO.whatsapp && <p className="nota">El envío por WhatsApp aún no está disponible. Puedes copiar el mensaje.</p>}

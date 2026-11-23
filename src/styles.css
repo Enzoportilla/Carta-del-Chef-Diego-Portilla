@@ -158,8 +158,8 @@ html:has(dialog[open]) { overflow: hidden; }
 .campo :is(input, textarea) { width: 100%; min-height: 3rem; padding: .6rem .85rem; border: 1px solid var(--borde-campo); border-radius: 12px; background: #fff; resize: vertical; }
 .campo ::placeholder { color: #767065; }
 .enviar { display: grid; place-items: center; min-height: 3.5rem; border: 0; border-radius: 999px; background: var(--dorado); color: var(--noche); font-weight: 700; font-size: 1.0625rem; text-decoration: none; }
-/* verde de WhatsApp; el texto va oscuro porque el blanco no se lee bien sobre él */
-.enviar--whatsapp { background: #25d366; }
+/* verde de WhatsApp oscurecido y letra de 19 px: sobre #25d366 el blanco no se alcanza a leer (2:1) */
+.enviar--whatsapp { display: flex; align-items: center; justify-content: center; gap: .6rem; background: #1da851; color: #fff; font-size: 1.1875rem; }
 .transferencia { display: grid; gap: .9rem; }
 .transferencia dl { display: grid; gap: .4rem; margin: 0; }
 .transferencia dl div { display: flex; justify-content: space-between; gap: 1rem; }

@@ -26,6 +26,7 @@ alter table public.productos enable row level security;
 drop policy if exists "publico ve activos" on public.productos;
 drop policy if exists "admin lee todo" on public.productos;
 drop policy if exists "admin actualiza" on public.productos;
+drop policy if exists "admin agrega" on public.productos;
 
 create policy "publico ve activos" on public.productos
   for select to anon, authenticated using (activo);
@@ -34,9 +35,12 @@ create policy "admin lee todo" on public.productos
 create policy "admin actualiza" on public.productos
   for update to authenticated using (public.es_admin()) with check (public.es_admin());
 
+create policy "admin agrega" on public.productos
+  for insert to authenticated with check (public.es_admin());
+
 revoke all on public.productos from anon, authenticated;
 grant select on public.productos to anon, authenticated;
-grant update on public.productos to authenticated;
+grant insert, update on public.productos to authenticated;
 
 -- Fotos: lectura pública por URL; solo el admin sube y borra.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)

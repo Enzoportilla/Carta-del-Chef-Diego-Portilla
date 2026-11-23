@@ -1,12 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase, urlFoto } from './supabase.js'
 import { CATEGORIAS } from './data.js'
+import { idDesdeNombre, leerPrecio, leerStock } from './producto.js'
 
 const ERRORES_LOGIN = {
   invalid_credentials: 'Correo o contraseña incorrectos.',
   email_not_confirmed: 'Esta cuenta aún no está confirmada. Confírmala en Supabase.',
   over_request_rate_limit: 'Demasiados intentos. Espera unos minutos.',
 }
+
+const STOCK_MALO = 'El stock debe ser un número entero, sin puntos ni comas.'
+const PRECIO_MALO = 'El precio debe ser un número mayor que cero, sin decimales.'
 
 function Login() {
   const [error, setError] = useState('')
@@ -49,22 +53,16 @@ function Fila({ p, onGuardar, onFoto, onAviso }) {
   useEffect(() => setPrecioTxt(String(p.precio_clp ?? '')), [p.precio_clp])
 
   const guardarStock = () => {
-    if (/^\d+$/.test(stockTxt.trim())) {
-      const n = Number(stockTxt)
-      setStockTxt(String(n))
-      if (n !== p.stock) onGuardar(p, { stock: n })
-    } else {
-      setStockTxt(String(p.stock))
-      onAviso('El stock debe ser un número entero, sin puntos ni comas.')
-    }
+    const n = leerStock(stockTxt)
+    setStockTxt(String(n ?? p.stock))
+    if (n === undefined) onAviso(STOCK_MALO)
+    else if (n !== p.stock) onGuardar(p, { stock: n })
   }
   const guardarPrecio = () => {
-    const texto = precioTxt.replace(/[$\s]/g, '')
-    const valido = /^(\d+|\d{1,3}(\.\d{3})+)$/.test(texto) // 2000 o 2.000
-    const n = valido ? Number(texto.replaceAll('.', '')) : null
-    if (texto ? !n : p.activo) {
+    const n = leerPrecio(precioTxt)
+    if (n === undefined || (n === null && p.activo)) {
       setPrecioTxt(String(p.precio_clp ?? ''))
-      return onAviso(texto ? 'El precio debe ser un número mayor que cero, sin decimales.' : 'Oculta el producto antes de quitar el precio.')
+      return onAviso(n === undefined ? PRECIO_MALO : 'Oculta el producto antes de quitar el precio.')
     }
     setPrecioTxt(String(n ?? ''))
     if (n !== p.precio_clp) onGuardar(p, { precio_clp: n })
@@ -110,6 +108,52 @@ function Fila({ p, onGuardar, onFoto, onAviso }) {
   )
 }
 
+function Nuevo({ onAgregar, onAviso }) {
+  const plegable = useRef(null)
+  const ocupado = useRef(false) // el estado llega tarde para frenar un doble toque
+  const [agregando, setAgregando] = useState(false)
+
+  const agregar = async (e) => {
+    e.preventDefault()
+    if (ocupado.current) return
+    const form = e.currentTarget
+    const d = Object.fromEntries([...new FormData(form)].map(([k, v]) => [k, v.trim()]))
+    const id = idDesdeNombre(d.nombre)
+    const precio_clp = leerPrecio(d.precio)
+    const stock = leerStock(d.stock)
+    if (!id) return onAviso('Escribe un nombre con letras o números.')
+    if (precio_clp === undefined) return onAviso(PRECIO_MALO)
+    if (stock === undefined) return onAviso(STOCK_MALO)
+    ocupado.current = true; setAgregando(true)
+    const agregado = await onAgregar({
+      id, categoria: d.categoria, nombre: d.nombre, formato: d.formato || null, descripcion: d.descripcion || null,
+      precio_clp, stock, activo: precio_clp !== null,
+    })
+    ocupado.current = false; setAgregando(false)
+    if (agregado) { form.reset(); plegable.current.open = false }
+  }
+
+  return (
+    <details className="nuevo" ref={plegable}>
+      <summary>Agregar producto</summary>
+      <form onSubmit={agregar}>
+        <label className="campo"><span>Nombre</span><input name="nombre" required maxLength={60} /></label>
+        <label className="campo"><span>Categoría</span>
+          <select name="categoria">{CATEGORIAS.map((c) => <option key={c.id} value={c.id}>{c.nombre}</option>)}</select>
+        </label>
+        <label className="campo"><span>Formato (opcional)</span><input name="formato" maxLength={60} placeholder="5 unidades de 70 g" /></label>
+        <div className="campos-dos">
+          <label className="campo"><span>Precio</span><input name="precio" inputMode="numeric" placeholder="2000" /></label>
+          <label className="campo"><span>Stock</span><input name="stock" inputMode="numeric" required /></label>
+        </div>
+        <label className="campo"><span>Descripción (opcional)</span><textarea name="descripcion" rows={2} maxLength={300} /></label>
+        <p className="nota">Con precio aparece de inmediato en la carta. Sin precio queda oculto. La foto se sube después, en la lista.</p>
+        <button type="submit" className="enviar" disabled={agregando}>{agregando ? 'Agregando…' : 'Agregar producto'}</button>
+      </form>
+    </details>
+  )
+}
+
 const FALLO = 'No se guardó el cambio'
 
 function Panel() {
@@ -150,6 +194,23 @@ function Panel() {
     return cola.current
   }
 
+  const agregar = async (producto) => {
+    setAviso('')
+    const orden = Math.max(0, ...guardadas.map((f) => f.orden)) + 10 // al final de su categoría
+    const { data, error } = await supabase.from('productos').insert({ ...producto, orden }).select().single()
+    if (error) {
+      console.error(error)
+      setAviso({
+        23505: 'Ya existe un producto con ese nombre.',
+        42501: 'Falta el permiso en Supabase para agregar productos, o venció la sesión. Sal y vuelve a entrar.',
+      }[error.code] ?? 'No se pudo agregar el producto. Inténtalo de nuevo.')
+      return false
+    }
+    setGuardadas((fs) => [...fs, data])
+    setAviso(`Se agregó ${data.nombre}.`)
+    return true
+  }
+
   const guardarFoto = async (p, archivo) => {
     setAviso('')
     let foto
@@ -171,6 +232,7 @@ function Panel() {
         <button type="button" className="cerrar" onClick={() => supabase.auth.signOut()}>Salir</button>
       </header>
       {!filas && !aviso && <p>Cargando…</p>}
+      {filas && <Nuevo onAgregar={agregar} onAviso={setAviso} />}
       {CATEGORIAS.map((c) => (
         <section key={c.id}>
           <h2>{c.nombre}</h2>

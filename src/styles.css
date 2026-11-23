@@ -28,7 +28,7 @@ h1, h2, h3 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
 h1, h2 { font-family: var(--titulo); color: var(--bronce); }
 img, svg { display: block; max-width: 100%; }
 [hidden] { display: none !important; }
-button, input, textarea { font: inherit; color: inherit; }
+button, input, textarea, select { font: inherit; color: inherit; }
 button { cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 button:disabled { cursor: not-allowed; opacity: .4; }
 a { color: var(--bronce); text-underline-offset: .2em; }
@@ -155,7 +155,7 @@ html:has(dialog[open]) { overflow: hidden; }
 .entrega input:focus-visible + span { outline: 2px solid var(--bronce); outline-offset: 3px; }
 .campo { display: grid; gap: .3rem; min-width: 0; }
 .campos-dos { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
-.campo :is(input, textarea) { width: 100%; min-height: 3rem; padding: .6rem .85rem; border: 1px solid var(--borde-campo); border-radius: 12px; background: #fff; resize: vertical; }
+.campo :is(input, textarea, select) { width: 100%; min-height: 3rem; padding: .6rem .85rem; border: 1px solid var(--borde-campo); border-radius: 12px; background: #fff; resize: vertical; }
 .campo ::placeholder { color: #767065; }
 .enviar { display: grid; place-items: center; min-height: 3.5rem; border: 0; border-radius: 999px; background: var(--dorado); color: var(--noche); font-weight: 700; font-size: 1.0625rem; text-decoration: none; }
 /* verde de WhatsApp oscurecido y letra de 19 px: sobre #25d366 el blanco no se alcanza a leer (2:1) */
@@ -187,6 +187,9 @@ html:has(dialog[open]) { overflow: hidden; }
 .admin__cabeza a { padding: .6rem 0; }
 .admin__aviso { position: fixed; inset: auto 0 0; z-index: 20; padding: .9rem var(--margen) calc(.9rem + env(safe-area-inset-bottom)); background: var(--dorado); color: var(--noche); font-weight: 700; text-align: center; }
 .admin__aviso:empty { display: none; }
+.nuevo { margin-top: 1rem; border: 1px solid var(--linea); border-radius: 12px; }
+.nuevo summary { padding: .75rem 1rem; color: var(--bronce); font-weight: 700; cursor: pointer; }
+.nuevo form { display: grid; gap: 1rem; padding: 0 1rem 1rem; }
 .fila {
   display: grid;
   grid-template-columns: 4.5rem auto 1fr auto;

@@ -63,7 +63,7 @@ Un panel de administración permite al chef gestionar productos y stock.
 - [x] Checkout WhatsApp (faltan datos de transferencia en `src/data.js`)
 - [x] Panel `#/admin`: stock, precio, visible y fotos
 - [ ] Panel: crear productos y categorías, configuración
-- [ ] Publicación (pasos en `docs/publicacion.md`)
+- [x] Publicación en GitHub Pages (pasos en `docs/publicacion.md`)
 
 ## Cómo trabajar en este proyecto
 - Antes de implementar una funcionalidad nueva, revisar `docs/requisitos.md` y `docs/decisiones.md`.

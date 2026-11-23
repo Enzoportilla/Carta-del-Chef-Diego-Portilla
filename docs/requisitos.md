@@ -11,7 +11,7 @@
 - [ ] Dirección y horario de retiro
 - [ ] Días/horarios en que se reciben pedidos
 - [x] Logo (recibido 2026-11-23) — colores tomados del logo
-- [x] Anticipación: 2 días; eventos, 1 semana (aún no se informa en la web)
+- [x] Anticipación: 2 días; eventos, 1 semana (informada en la web)
 - [x] Eventos: sin mínimo
 - [ ] ¿Pedido mínimo para el resto de la carta?
 - [x] Panel: el chef desde el celular y Enzo desde el computador

@@ -23,8 +23,8 @@
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 6rem; -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: var(--nieve); color: var(--noche); font: 400 1.0625rem/1.5 var(--texto); }
-h1, h2, h3, p, ul { margin: 0; padding: 0; }
-h1, h2, h3 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
+h1, h2, h3, h4, p, ul { margin: 0; padding: 0; }
+h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
 h1, h2 { font-family: var(--titulo); color: var(--bronce); }
 img, svg { display: block; max-width: 100%; }
 [hidden] { display: none !important; }
@@ -33,6 +33,9 @@ button { cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action
 button:disabled { cursor: not-allowed; opacity: .4; }
 a { color: var(--bronce); text-underline-offset: .2em; }
 :focus-visible { outline: 2px solid var(--bronce); outline-offset: 3px; }
+::selection { background: var(--dorado); color: var(--noche); }
+:is(input, textarea) { caret-color: var(--bronce); }
+html { scrollbar-color: var(--dorado) var(--nieve); }
 .solo-lector { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 /* ---------- Portada: la noche del logo ---------- */
@@ -40,7 +43,7 @@ a { color: var(--bronce); text-underline-offset: .2em; }
 /* lighten y la máscara funden el fondo del PNG con el de la portada */
 .portada img { width: min(86%, 23rem); height: auto; margin: 0 auto 1rem; mix-blend-mode: lighten;
   mask: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent) intersect, linear-gradient(transparent, #000 5%, #000 95%, transparent); }
-.portada p { max-width: 40ch; margin: 0 auto; line-height: 1.45; text-wrap: balance; }
+.portada p { max-width: 60ch; margin: 0 auto; line-height: 1.45; text-wrap: balance; }
 
 /* ---------- Cordillera: cerros nevados contra la noche; la estrella marca la categoría ---------- */
 .cordillera {
@@ -56,6 +59,9 @@ a { color: var(--bronce); text-underline-offset: .2em; }
 }
 .cordillera::-webkit-scrollbar { display: none; }
 .cordillera a { flex: 1 0 auto; min-width: 5.25rem; padding: 0 .6rem .7rem; color: var(--piedra); line-height: 1.3; text-align: center; text-decoration: none; white-space: nowrap; }
+.cordillera a:hover { color: var(--noche); }
+/* misma altura que las pestañas: la carta no salta al terminar de cargar */
+.cordillera__espera { width: 100%; height: calc(var(--alto-cerro) + 1.3em + .7rem); }
 .cordillera a:focus-visible { outline-offset: -3px; }
 .cordillera a[aria-current] { color: var(--noche); font-weight: 700; }
 /* medio píxel de traslape: sin él se ve la unión entre cerros; width 0 para que el dibujo no ensanche la pestaña */
@@ -67,27 +73,29 @@ a { color: var(--bronce); text-underline-offset: .2em; }
 
 /* ---------- Carta ---------- */
 .carta { max-width: var(--ancho); margin: 0 auto; padding: 0 var(--margen) 7rem; }
-.carta section { padding-top: 2rem; }
+.carta section { padding-top: 2.75rem; }
 .carta section:last-child { min-height: calc(100svh - 25rem); } /* deja que la última categoría llegue a marcarse (300 px en App.jsx, menos el margen inferior) */
 .carta h2 { margin-bottom: .5rem; font-size: 1.5rem; }
 .lista { list-style: none; }
-.producto { display: flex; gap: 1rem; padding: .7rem 0; }
+.grupo { margin-top: 1.5rem; }
+.grupo h3 { margin-bottom: .25rem; font-family: var(--titulo); font-size: 1.125rem; }
+.producto { display: flex; gap: 1rem; padding: .55rem 0; }
 .producto__foto { flex: none; width: 72px; height: 72px; object-fit: cover; border-radius: 12px; }
-.producto__cuerpo { flex: 1; min-width: 0; }
+.producto__cuerpo { display: flex; flex-direction: column; flex: 1; min-width: 0; }
 .renglon { display: flex; align-items: baseline; gap: .5rem; }
-.renglon h3 { font-size: 1.125rem; font-weight: 700; }
+.producto__nombre { font-size: 1.125rem; font-weight: 700; }
 .puntos { flex: 1; min-width: 1rem; border-bottom: 2px dotted #d9cba4; }
 .precio { color: var(--bronce); font-size: 1.125rem; font-weight: 700; font-variant-numeric: tabular-nums; }
 .producto__desc { max-width: 60ch; padding-left: 1rem; text-indent: -1rem; line-height: 1.4; margin-top: .2rem; /* sangría francesa: se distingue dónde empieza cada ítem */ font-size: .9375rem; }
-.producto__pie { display: flex; align-items: center; justify-content: space-between; gap: .75rem; min-height: 2.75rem; color: var(--piedra); font-size: .9375rem; }
-.producto--agotado :is(h3, .precio) { color: var(--piedra); font-weight: 400; }
+.producto__pie { display: flex; margin-top: auto; align-items: flex-start; justify-content: space-between; gap: .75rem; min-height: 2.75rem; padding-top: .15rem; color: var(--piedra); font-size: .9375rem; }
+.producto--agotado :is(.producto__nombre, .precio) { color: var(--piedra); font-weight: 400; }
 .producto--agotado img { filter: grayscale(1); opacity: .6; }
 .agotado { font-weight: 700; }
 
 /* Sumar y restar: el + queda quieto y el resto se abre hacia la izquierda */
 .paso { display: inline-flex; align-items: center; flex: none; border-radius: 999px; color: var(--noche); }
 .paso--elegido, .fila .paso { background: var(--marfil); }
-.paso button { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; padding: 0; border: 0; border-radius: 50%; background: none; font-size: 1.5rem; line-height: 1; }
+.paso button { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; padding: 0; border: 0; border-radius: 50%; background: none; }
 .paso .paso__mas { background: var(--marfil); color: var(--bronce); transition: background-color 160ms, color 160ms; }
 .paso--elegido .paso__mas, .paso .paso__mas:hover:enabled { background: var(--dorado); color: var(--noche); }
 .paso button:active:enabled { transform: scale(.92); }
@@ -95,13 +103,16 @@ a { color: var(--bronce); text-underline-offset: .2em; }
 
 .agregar { min-height: 2.75rem; padding: 0 1.25rem; border: 1px solid var(--dorado); border-radius: 999px; background: none; color: var(--bronce); font-weight: 700; }
 .agregar:hover { background: var(--marfil); }
+.paso button:not(.paso__mas):hover:enabled { background: var(--linea); }
 .estado { padding: 3rem 0; text-align: center; }
 .estado .agregar { margin-top: 1rem; }
+.pie > p { max-width: 60ch; }
+.pie > p + p { margin-top: .75rem; }
 .pie { max-width: var(--ancho); margin: 0 auto; padding: 1.5rem var(--margen) 7rem; border-top: 1px solid var(--linea); color: var(--piedra); }
 .carta:has(+ .pie) { padding-bottom: 2rem; }
 
 /* ---------- Barra del pedido ---------- */
-.barra { position: fixed; inset: auto 0 0; z-index: 20; padding: .75rem var(--margen) calc(.75rem + env(safe-area-inset-bottom)); pointer-events: none; }
+.barra { position: fixed; inset: auto 0 0; z-index: 20; padding: .75rem var(--margen) calc(.75rem + env(safe-area-inset-bottom)); pointer-events: none; animation: subir 320ms var(--salida); }
 .barra__ver {
   pointer-events: auto;
   display: flex;
@@ -120,6 +131,8 @@ a { color: var(--bronce); text-underline-offset: .2em; }
   font-size: 1.0625rem;
   box-shadow: 0 0 0 4px var(--nieve);
 }
+.barra__ver:hover, .enviar:hover:not(:disabled) { filter: brightness(1.06); }
+.barra__ver:active, .enviar:active { transform: scale(.985); }
 .barra__cuenta { min-width: 1.75rem; padding: 0 .4rem; border-radius: 1rem; background: var(--marfil); text-align: center; font-variant-numeric: tabular-nums; }
 .barra__total { margin-left: auto; font-variant-numeric: tabular-nums; }
 .barra__ajuste { pointer-events: auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; max-width: 28rem; margin: 0 auto .6rem; padding: .25rem 1.25rem; border: 1px solid var(--cobre); border-radius: 12px; background: var(--nieve); color: var(--cobre); font-weight: 700; line-height: 1.3; }
@@ -137,6 +150,8 @@ html:has(dialog[open]) { overflow: hidden; }
 .pedido h3 { font-size: 1.0625rem; }
 .cerrar, .vaciar { min-height: 2.75rem; padding: 0 .25rem; border: 0; background: none; color: var(--bronce); text-decoration: underline; text-underline-offset: .2em; }
 .vaciar { justify-self: center; color: var(--piedra); }
+.vaciar:hover, .cerrar:hover { color: var(--noche); }
+.pedido__otras { display: flex; flex-wrap: wrap; justify-content: center; gap: 0 1.75rem; }
 .lineas { list-style: none; display: grid; gap: 1rem; }
 .lineas li { display: grid; grid-template-columns: 1fr auto auto; gap: .75rem; align-items: center; line-height: 1.3; }
 .lineas p { text-wrap: balance; }
@@ -145,7 +160,7 @@ html:has(dialog[open]) { overflow: hidden; }
 .total { display: flex; justify-content: space-between; padding-top: .9rem; border-top: 1px solid var(--linea); font-weight: 700; font-size: 1.1875rem; font-variant-numeric: tabular-nums; }
 .nota { color: var(--piedra); font-size: .9375rem; }
 .aviso { color: var(--cobre); font-weight: 700; }
-.aviso:empty { display: none; }
+.aviso:empty { position: absolute; } /* sin display: none, para que el lector de pantalla anuncie el aviso cuando llega */
 .entrega { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; min-width: 0; margin: 0; padding: 0; border: 0; }
 .entrega legend { margin-bottom: .4rem; padding: 0; }
 .entrega label { position: relative; }
@@ -166,9 +181,13 @@ html:has(dialog[open]) { overflow: hidden; }
 .transferencia dt { color: var(--piedra); }
 .transferencia dd { margin: 0; font-weight: 700; text-align: right; overflow-wrap: anywhere; user-select: all; }
 
+@media (min-width: 46rem) {
+  :root { --ancho: 62rem; --margen: 2rem; }
+  .lista { display: grid; grid-template-columns: 1fr 1fr; column-gap: clamp(2rem, 5vw, 4rem); }
+}
 @media (min-width: 64rem) {
-  :root { --ancho: 62rem; --alto-cerro: 3.5rem; }
-  .lista { display: grid; grid-template-columns: 1fr 1fr; column-gap: 4rem; }
+  :root { --alto-cerro: 3.5rem; }
+  .grupo:first-of-type .lista:has(> :nth-child(3):last-child) { grid-template-columns: repeat(3, 1fr); column-gap: 2.5rem; } /* tres menús en una fila */
   .pedido { width: 28rem; height: 100dvh; max-height: 100dvh; margin: 0 0 0 auto; border-radius: 0; }
   .pedido__hoja { min-height: 100%; align-content: start; }
   .pedido[open] { animation-name: entrar; }

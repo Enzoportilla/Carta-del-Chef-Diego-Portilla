@@ -4,7 +4,10 @@ export const NEGOCIO = {
   nombre: 'Chef Diego Portilla',
   whatsapp: '56987738728', // 569XXXXXXXX; vacío = el envío queda deshabilitado
   retiro: '', // dirección y horario de retiro, p. ej. 'Calle 123, Comuna. Lunes a viernes de 10:00 a 18:00'
+  anticipacion: { carta: '2 días', eventos: '1 semana' },
 }
+
+export const COORDINAR = 'El pago y la entrega se coordinan con el Chef en la conversación.'
 
 // { banco, tipo, numero, rut, titular, correo }; null = se coordina por WhatsApp
 export const TRANSFERENCIA = null

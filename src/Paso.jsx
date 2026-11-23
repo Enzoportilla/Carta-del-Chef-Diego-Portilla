@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { leerStock } from './producto.js'
+import { Mas, Menos } from './Iconos.jsx'
 
 // Se puede escribir la cantidad: un menú para 30 personas no se arma tocando +.
 function Cantidad({ producto, cantidad, onCambiar }) {
@@ -24,11 +25,11 @@ export default function Paso({ producto, cantidad = 0, onCambiar }) {
     <div className={`paso${cantidad ? ' paso--elegido' : ''}`} role="group" aria-label={producto.nombre}>
       {cantidad > 0 && (
         <>
-          <button type="button" onClick={() => onCambiar(producto, -1)} aria-label={`Quitar ${producto.nombre}`}>−</button>
+          <button type="button" onClick={() => onCambiar(producto, -1)} aria-label={`Quitar ${producto.nombre}`}><Menos /></button>
           <Cantidad producto={producto} cantidad={cantidad} onCambiar={onCambiar} />
         </>
       )}
-      <button type="button" className="paso__mas" onClick={() => onCambiar(producto, 1)} disabled={cantidad >= producto.stock} aria-label={`Agregar ${producto.nombre}`}>+</button>
+      <button type="button" className="paso__mas" onClick={() => onCambiar(producto, 1)} disabled={cantidad >= producto.stock} aria-label={`Agregar ${producto.nombre}`}><Mas /></button>
     </div>
   )
 }

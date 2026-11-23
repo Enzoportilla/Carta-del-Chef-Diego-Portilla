@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase, urlFoto } from './supabase.js'
 import { CATEGORIAS } from './data.js'
+import { Mas, Menos } from './Iconos.jsx'
 import { idDesdeNombre, idLibre, leerPrecio, leerStock, nombreRepetido } from './producto.js'
 
 const ERRORES_LOGIN = {
@@ -110,9 +111,9 @@ function Fila({ p, repetido, onGuardar, onFoto, onAviso }) {
             : p.stock === 0 && <p className="aviso">Agotado</p>}
       </div>
       <div className="paso" role="group" aria-label={`Stock de ${p.nombre}`}>
-        <button type="button" disabled={p.stock === 0} onClick={() => onGuardar(p, { stock: p.stock - 1 })} aria-label={`Restar stock de ${p.nombre}`}>−</button>
+        <button type="button" disabled={p.stock === 0} onClick={() => onGuardar(p, { stock: p.stock - 1 })} aria-label={`Restar stock de ${p.nombre}`}><Menos /></button>
         <input inputMode="numeric" value={stockTxt} aria-label={`Stock de ${p.nombre}`} onChange={(e) => setStockTxt(e.target.value)} onBlur={guardarStock} onKeyDown={alEnter} />
-        <button type="button" onClick={() => onGuardar(p, { stock: p.stock + 1 })} aria-label={`Sumar stock de ${p.nombre}`}>+</button>
+        <button type="button" onClick={() => onGuardar(p, { stock: p.stock + 1 })} aria-label={`Sumar stock de ${p.nombre}`}><Mas /></button>
       </div>
       <label className="fila__precio">
         <span aria-hidden="true">$</span>

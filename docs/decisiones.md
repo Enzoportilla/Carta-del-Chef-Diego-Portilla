@@ -20,3 +20,6 @@
 | 2026-11-23 | Eventos es una categoría más: los menús se piden por persona y los paquetes por 100 unidades; la cantidad se puede escribir | Usa el mismo carrito, mensaje y panel; el chef puede cambiar precios y agregar menús |
 | 2026-11-23 | Stock 999 en eventos equivale a sin límite | Se hacen por encargo; en 0 se muestra "Agotado" |
 | 2026-11-23 | Datos de transferencia sin publicar, productos sin precio ocultos, eventos sin mínimo, comunas de delivery sin definir | Respuestas del usuario |
+| 2026-11-23 | La web informa la anticipación (2 días; eventos, 1 semana) desde `src/data.js`; no la valida | Pulido con Impeccable (borrador): el cliente no tenía cómo saberlo |
+| 2026-11-23 | En Eventos, los menús por persona se separan de los paquetes según el formato "Por persona" | El precio por persona se leía como total |
+| 2026-11-23 | "Vaciar pedido" pide un segundo toque; "Copiar mensaje" pasa a enlace secundario | Se perdía el pedido con un toque y competía con "Confirmar" |

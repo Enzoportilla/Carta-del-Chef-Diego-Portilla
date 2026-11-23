@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { CATEGORIAS, NEGOCIO } from './data.js'
+import { CATEGORIAS, COORDINAR, NEGOCIO } from './data.js'
 import { supabase, urlFoto } from './supabase.js'
 import { cambiar, precio, resumen } from './cart.js'
 import { guardar, leer } from './almacen.js'
@@ -54,7 +54,7 @@ function Cordillera({ categorias, activa }) {
   )
 }
 
-function Producto({ producto, cantidad, onCambiar }) {
+function Producto({ producto, cantidad, onCambiar, Titulo = 'h3' }) {
   const agotado = producto.stock <= 0
   return (
     <li className={`producto${agotado ? ' producto--agotado' : ''}`}>
@@ -64,7 +64,7 @@ function Producto({ producto, cantidad, onCambiar }) {
       )}
       <div className="producto__cuerpo">
         <div className="renglon">
-          <h3>{producto.nombre}</h3>
+          <Titulo className="producto__nombre">{producto.nombre}</Titulo>
           <span className="puntos" aria-hidden="true" />
           <p className="precio">{precio(producto.precio_clp)}</p>
         </div>
@@ -78,6 +78,9 @@ function Producto({ producto, cantidad, onCambiar }) {
     </li>
   )
 }
+
+// shortcut: en eventos, el formato "Por persona" es lo que distingue un menú de un paquete; si hay más tipos, conviene una columna propia.
+const esMenu = (p) => /por persona/i.test(p.formato ?? '')
 
 export default function App() {
   const [carrito, setCarrito] = useState(() => leer(CLAVE) ?? {})
@@ -139,15 +142,23 @@ export default function App() {
     return () => window.removeEventListener('scroll', revisar)
   }, [categorias])
 
+  const lista = (grupo, Titulo) => (
+    <ul className="lista">
+      {grupo.map((p) => <Producto key={p.id} producto={p} cantidad={cantidades[p.id]} onCambiar={onCambiar} Titulo={Titulo} />)}
+    </ul>
+  )
+
   return (
     <>
       <header className="portada">
         <h1><img src={`${import.meta.env.BASE_URL}img/logo-chef-diego-portilla.png`} alt={NEGOCIO.nombre} width="641" height="394" /></h1>
         <p>Panes, dulces y masas hechos por el chef.</p>
-        <p>Toca + para armar tu pedido y envíalo por WhatsApp.</p>
+        <p>Arma tu pedido y envíalo por WhatsApp, con {NEGOCIO.anticipacion.carta} de anticipación.</p>
       </header>
 
-      {categorias.length > 0 && <Cordillera categorias={categorias} activa={activa} />}
+      {categorias.length > 0 ? <Cordillera categorias={categorias} activa={activa} /> : (
+        <div className="cordillera" aria-hidden="true"><span className="cordillera__espera" /></div>
+      )}
 
       <main className="carta">
         {error && (
@@ -161,11 +172,20 @@ export default function App() {
         {categorias.map((c) => (
           <section key={c.id} id={c.id} aria-labelledby={`${c.id}-titulo`}>
             <h2 id={`${c.id}-titulo`}>{c.nombre}</h2>
-            <ul className="lista">
-              {productos.filter((p) => p.categoria === c.id).map((p) => (
-                <Producto key={p.id} producto={p} cantidad={cantidades[p.id]} onCambiar={onCambiar} />
-              ))}
-            </ul>
+            {c.id === 'eventos' ? (
+              <>
+                <p className="nota">Pide tu evento con {NEGOCIO.anticipacion.eventos} de anticipación.</p>
+                {[['Menús por persona', esMenu], ['Paquetes', (p) => !esMenu(p)]].map(([titulo, entra]) => {
+                  const grupo = productos.filter((p) => p.categoria === c.id && entra(p))
+                  return grupo.length > 0 && (
+                    <div key={titulo} className="grupo">
+                      <h3>{titulo}</h3>
+                      {lista(grupo, 'h4')}
+                    </div>
+                  )
+                })}
+              </>
+            ) : lista(productos.filter((p) => p.categoria === c.id))}
           </section>
         ))}
       </main>
@@ -173,7 +193,8 @@ export default function App() {
       {(NEGOCIO.retiro || NEGOCIO.whatsapp) && (
         <footer className="pie">
           {NEGOCIO.retiro && <p>Retiro: {NEGOCIO.retiro}</p>}
-          {NEGOCIO.whatsapp && <p><a href={`https://wa.me/${NEGOCIO.whatsapp}`}>Escribir por WhatsApp</a></p>}
+          <p>Pide con {NEGOCIO.anticipacion.carta} de anticipación; eventos, con {NEGOCIO.anticipacion.eventos}. {COORDINAR}</p>
+          {NEGOCIO.whatsapp && <p><a href={`https://wa.me/${NEGOCIO.whatsapp}`}>Escribir al Chef por WhatsApp</a></p>}
         </footer>
       )}
 

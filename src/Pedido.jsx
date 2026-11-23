@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { NEGOCIO, TRANSFERENCIA } from './data.js'
+import { COORDINAR, NEGOCIO, TRANSFERENCIA } from './data.js'
 import { enlaceWhatsApp, mensajePedido, precio, resumen, telefonoInternacional } from './cart.js'
 import { guardar, leer } from './almacen.js'
 import Paso from './Paso.jsx'
 
 const CLAVE = 'chef-diego-pedido-datos'
-const COORDINAR = 'El pago y la entrega se coordinan con el Chef en la conversación.'
 const VACIO = { entrega: 'retiro', nombre: '', apellido: '', telefono: '', direccion: '', comuna: '', referencias: '', comentario: '' }
 
 function leerDatos() {
@@ -31,6 +30,16 @@ const datosTransferencia = (total) => [
   ['RUT', TRANSFERENCIA.rut], ['Nombre', TRANSFERENCIA.titular], ['Correo', TRANSFERENCIA.correo], ['Monto', total],
 ].filter(([, v]) => v)
 
+// Dos toques: vaciar no se puede deshacer.
+function Vaciar({ onVaciar }) {
+  const [seguro, setSeguro] = useState(false)
+  return (
+    <button type="button" className="vaciar" onClick={() => (seguro ? onVaciar() : setSeguro(true))} onBlur={() => setSeguro(false)}>
+      {seguro ? 'Toca otra vez para vaciar' : 'Vaciar pedido'}
+    </button>
+  )
+}
+
 // Lo que se acaba de confirmar: se muestra tal cual aunque el carrito cambie después.
 function Confirmacion({ enviado, onCopiar, onVaciar, aviso }) {
   const datos = TRANSFERENCIA && datosTransferencia(precio(enviado.total))
@@ -51,7 +60,7 @@ function Confirmacion({ enviado, onCopiar, onVaciar, aviso }) {
         </section>
       )}
       <p className="aviso" role="status">{aviso}</p>
-      <button type="button" className="vaciar" onClick={onVaciar}>Vaciar pedido</button>
+      <Vaciar onVaciar={onVaciar} />
     </>
   )
 }
@@ -59,6 +68,7 @@ function Confirmacion({ enviado, onCopiar, onVaciar, aviso }) {
 export default function Pedido({ abierto, onCerrar, res, ajuste, carrito, onCambiar, onVaciar, onRecargar }) {
   const dialogo = useRef(null)
   const formulario = useRef(null)
+  const titulo = useRef(null)
   const [datos, setDatos] = useState(leerDatos)
   const [aviso, setAviso] = useState('')
   const [enviando, setEnviando] = useState(false)
@@ -70,6 +80,8 @@ export default function Pedido({ abierto, onCerrar, res, ajuste, carrito, onCamb
     if (abierto && !d.open) { setAviso(''); setEnviado(null); d.showModal() }
     if (!abierto && d.open) d.close()
   }, [abierto])
+
+  useEffect(() => { if (enviado) titulo.current.focus() }, [enviado])
 
   const campo = (k) => ({ value: datos[k], onChange: (e) => setDatos({ ...datos, [k]: e.target.value }) })
   const texto = (k) => ({ ...campo(k), required: true, pattern: '.*\\S.*', title: 'Completa este campo' })
@@ -96,7 +108,7 @@ export default function Pedido({ abierto, onCerrar, res, ajuste, carrito, onCamb
       onClick={(e) => e.target === dialogo.current && onCerrar()}>
       <div className="pedido__hoja">
         <header className="pedido__cabeza">
-          <h2 id="pedido-titulo">{enviado ? 'Falta un paso' : 'Tu pedido'}</h2>
+          <h2 id="pedido-titulo" ref={titulo} tabIndex={-1}>{enviado ? 'Falta un paso' : 'Tu pedido'}</h2>
           <button type="button" className="cerrar" onClick={onCerrar}>Cerrar</button>
         </header>
 
@@ -151,12 +163,16 @@ export default function Pedido({ abierto, onCerrar, res, ajuste, carrito, onCamb
                 </label>
                 <label className="campo"><span>Comentario (opcional)</span><textarea rows={2} {...campo('comentario')} /></label>
 
+                <p className="nota">
+                  Pide con {NEGOCIO.anticipacion.carta} de anticipación{res.lineas.some((l) => l.producto.categoria === 'eventos') && `; eventos, con ${NEGOCIO.anticipacion.eventos}`}. {COORDINAR}
+                </p>
                 <p className="aviso" role="status">{aviso}</p>
                 <button type="submit" className="enviar" disabled={!NEGOCIO.whatsapp || enviando}>{enviando ? 'Confirmando stock…' : 'Confirmar pedido'}</button>
                 {!NEGOCIO.whatsapp && <p className="nota">El envío por WhatsApp aún no está disponible. Puedes copiar el mensaje.</p>}
-                <button type="button" className="agregar" onClick={() => formulario.current.reportValidity() && copiarYAvisar(mensaje, 'Mensaje copiado.')}>Copiar mensaje</button>
-                <p className="nota">{COORDINAR}</p>
-                <button type="button" className="vaciar" onClick={onVaciar}>Vaciar pedido</button>
+                <div className="pedido__otras">
+                  <button type="button" className="vaciar" onClick={() => formulario.current.reportValidity() && copiarYAvisar(mensaje, 'Mensaje copiado.')}>Copiar mensaje</button>
+                  <Vaciar key={abierto} onVaciar={onVaciar} />
+                </div>
               </>
             )}
           </form>

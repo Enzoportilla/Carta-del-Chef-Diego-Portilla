@@ -43,25 +43,27 @@ Un panel de administración permite al chef gestionar productos y stock.
 - Logo: `public/img/logo-chef-diego-portilla.png`. Paleta y estilo: `docs/identidad-visual.md`.
 - Estilo: negro + dorado + crema, elegante, con motivo de montañas.
 
-## Estructura de carpetas (inicial)
+## Estructura de carpetas
 ```
 /.devcontainer  Configuración del contenedor de desarrollo
 /docs        Requisitos, decisiones y notas del proyecto
-/src         Código fuente (se definirá al elegir el stack)
-/public      Imágenes de productos y recursos estáticos
+/src         Código fuente (React)
+/supabase    Esquema, permisos y semilla
+/public      Logo e ícono (las fotos de productos viven en Supabase Storage)
 ```
 
 ## Estado
 - [x] Estructura base del proyecto
 - [x] Contenedor de desarrollo para Claude Code
-- [ ] Definir stack técnico y hosting (ver `docs/decisiones.md`)
+- [x] Stack y hosting: Vite + React, Supabase, GitHub Pages (ver `docs/decisiones.md`)
 - [x] Logo recibido (`public/img/logo-chef-diego-portilla.png`) y paleta en `docs/identidad-visual.md`
-- [ ] Confirmar tipografías
-- [ ] Cargar catálogo inicial de productos
-- [ ] Construir carta + carrito
-- [ ] Checkout WhatsApp (delivery / retiro / transferencia)
-- [ ] Panel de administración y stock
-- [ ] Publicación
+- [x] Tipografías: Cinzel y Lato
+- [x] Catálogo inicial (`supabase/schema.sql`; faltan precios, fotos y stock real)
+- [x] Construir carta + carrito
+- [x] Checkout WhatsApp (faltan número y datos de transferencia en `src/data.js`)
+- [x] Panel `#/admin`: stock, precio, visible y fotos
+- [ ] Panel: crear productos y categorías, configuración
+- [ ] Publicación (pasos en `docs/publicacion.md`)
 
 ## Cómo trabajar en este proyecto
 - Antes de implementar una funcionalidad nueva, revisar `docs/requisitos.md` y `docs/decisiones.md`.

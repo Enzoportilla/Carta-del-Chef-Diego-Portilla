@@ -16,9 +16,9 @@
 | Acento / botones / precios | Dorado | `#AF8B55` |
 | Acento cálido (estrella) | Ámbar | `#DE9A51` |
 
-## Tipografía (sugerida, por confirmar)
-- Títulos: serif clásica de mayúsculas (estilo del logo), p. ej. *Cinzel* o *Playfair Display*.
-- Texto: sans legible, p. ej. *Inter* o *Lato*.
+## Tipografía (en uso)
+- Títulos y nombres de producto: *Cinzel* 600.
+- Texto y precios: *Lato* 400 y 700.
 
 ## Notas
 - El logo tiene fondo negro (no transparente): usarlo sobre fondos oscuros.

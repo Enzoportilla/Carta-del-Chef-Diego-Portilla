@@ -1,0 +1,139 @@
+:root {
+  --noche: #060b0f;
+  --grafito: #13171b;
+  --crema: #f0e2b3;
+  --marfil: #f8f1cd;
+  --dorado: #af8b55;
+  --ambar: #de9a51;
+  --crema-suave: #bdb396; /* crema apagada para textos secundarios */
+  --linea: #4a3f2c;
+
+  --titulo: 'Cinzel', 'Times New Roman', serif;
+  --texto: 'Lato', system-ui, sans-serif;
+  --alto-cerro: 3.25rem;
+  --margen: 16px;
+  --ancho: 44rem;
+  --salida: cubic-bezier(.16, 1, .3, 1);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 7rem; -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--noche); color: var(--crema); font: 400 1.0625rem/1.5 var(--texto); }
+h1, h2, h3, p, ul { margin: 0; padding: 0; }
+h1, h2, h3 { font-family: var(--titulo); font-weight: 600; line-height: 1.2; text-wrap: balance; }
+img, svg { display: block; max-width: 100%; }
+[hidden] { display: none !important; }
+button, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; border-radius: 2px; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+button:disabled { cursor: not-allowed; opacity: .45; }
+a { color: var(--marfil); text-underline-offset: .2em; }
+:focus-visible { outline: 2px solid var(--marfil); outline-offset: 3px; }
+.solo-lector { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* ---------- Portada ---------- */
+.portada { max-width: var(--ancho); margin: 0 auto; padding: 1.5rem var(--margen) 1.75rem; text-align: center; }
+/* lighten y la máscara funden el fondo del PNG con el de la página */
+.portada img { width: min(100%, 27rem); height: auto; margin: 0 auto 1.25rem; mix-blend-mode: lighten;
+  mask: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent) intersect, linear-gradient(transparent, #000 5%, #000 95%, transparent); }
+.portada p { max-width: 34ch; margin: 0 auto; font-size: 1.25rem; line-height: 1.4; text-wrap: balance; }
+
+/* ---------- Cordillera: un cerro por categoría, la estrella marca la actual ---------- */
+.cordillera {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  overflow-x: auto;
+  padding-top: 1rem;
+  background: var(--noche);
+  border-bottom: 1px solid var(--linea);
+  scrollbar-width: none;
+}
+.cordillera::-webkit-scrollbar { display: none; }
+.cordillera a {
+  flex: 1 0 auto;
+  min-width: 7.25rem;
+  padding: 0 .9rem .6rem;
+  color: var(--crema-suave);
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.cordillera a:focus-visible { outline-offset: -3px; }
+.cordillera a[aria-current] { color: var(--marfil); font-weight: 700; }
+.cordillera a svg { width: calc(100% + 1.8rem); max-width: none; height: var(--alto-cerro); margin: 0 -.9rem .2rem; }
+.cordillera a path { fill: none; stroke: var(--dorado); stroke-width: 1.5; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.cordillera a path.nieve { fill: var(--crema); stroke: none; }
+.cordillera .estrella {
+  position: absolute;
+  left: -.625rem;
+  top: -.4rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  pointer-events: none;
+  transition: transform 600ms var(--salida);
+}
+.estrella path { fill: var(--ambar); }
+
+/* ---------- Carta ---------- */
+.carta { max-width: var(--ancho); margin: 0 auto; padding: 0 var(--margen) 7rem; }
+.carta section { padding-top: 2.5rem; }
+.carta section:last-child { min-height: 60svh; } /* permite que la última categoría llegue a marcarse */
+.carta h2 { color: var(--dorado); font-size: 1.75rem; margin-bottom: .75rem; }
+.lista { list-style: none; }
+.producto { display: flex; gap: 1rem; padding: .8rem 0; }
+.producto__foto { flex: none; width: 88px; height: 88px; object-fit: cover; border-radius: 2px; }
+.producto__cuerpo { flex: 1; min-width: 0; }
+.renglon { display: flex; align-items: baseline; gap: .5rem; }
+.renglon h3 { font-size: 1.1875rem; }
+.puntos { flex: 1; min-width: 1rem; border-bottom: 2px dotted var(--linea); }
+.precio { color: var(--dorado); font-weight: 700; font-size: 1.1875rem; font-variant-numeric: tabular-nums; }
+.producto__desc { max-width: 60ch; font-size: .9375rem; }
+.producto__pie { display: flex; align-items: center; justify-content: space-between; gap: .75rem; min-height: 2.75rem; margin-top: .25rem; color: var(--crema-suave); font-size: .9375rem; }
+.producto--agotado :is(h3, .precio, img) { opacity: .55; }
+.agotado { color: var(--ambar); font-weight: 700; }
+
+.agregar { min-height: 2.75rem; padding: 0 1.1rem; border: 1px solid var(--dorado); background: none; color: var(--marfil); font-weight: 700; font-size: 1.0625rem; }
+.agregar:hover { background: var(--grafito); }
+.paso { display: inline-flex; align-items: center; border: 1px solid var(--dorado); border-radius: 2px; color: var(--marfil); }
+.paso button { width: 2.75rem; height: 2.75rem; border: 0; background: none; font-size: 1.375rem; line-height: 1; }
+.paso button:hover:enabled { background: var(--grafito); }
+.paso output { min-width: 1.75rem; text-align: center; font-size: 1.0625rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.estado { padding: 3rem 0; text-align: center; }
+.estado .agregar { margin-top: 1rem; }
+.pie { max-width: var(--ancho); margin: 0 auto; padding: 1.5rem var(--margen) 7rem; border-top: 1px solid var(--linea); color: var(--crema-suave); }
+.carta:has(+ .pie) { padding-bottom: 2rem; }
+
+/* ---------- Barra del pedido ---------- */
+.barra { position: fixed; inset: auto 0 0; z-index: 20; padding: .75rem var(--margen) calc(.75rem + env(safe-area-inset-bottom)); pointer-events: none; }
+.barra button {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  width: 100%;
+  max-width: 30rem;
+  min-height: 3.5rem;
+  margin: 0 auto;
+  padding: 0 1.1rem;
+  border: 0;
+  background: var(--dorado);
+  color: var(--noche);
+  font-weight: 700;
+  font-size: 1.125rem;
+}
+.barra__cuenta { min-width: 1.75rem; padding: 0 .4rem; border-radius: 1rem; background: var(--noche); color: var(--ambar); text-align: center; font-variant-numeric: tabular-nums; }
+.barra__total { margin-left: auto; font-variant-numeric: tabular-nums; }
+
+@media (min-width: 64rem) {
+  :root { --ancho: 64rem; }
+  .cordillera { justify-content: center; }
+  .cordillera a { flex: 0 1 13rem; }
+  .lista { display: grid; grid-template-columns: 1fr 1fr; column-gap: 4rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+}

@@ -5,7 +5,7 @@
 - [ ] Precio de: dona rellena, falafel, masa de empanada, empolvados y empanada de queso
 - [ ] Fotos de los productos (se suben desde el panel)
 - [ ] Stock real (la semilla usa 10 de ejemplo)
-- [ ] Número de WhatsApp que recibirá los pedidos
+- [x] Número de WhatsApp que recibirá los pedidos (`src/data.js`)
 - [ ] Datos de transferencia (banco, tipo de cuenta, RUT, nombre, correo)
 - [ ] Zonas/comunas de delivery y costo de envío
 - [ ] Dirección y horario de retiro

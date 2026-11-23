@@ -38,8 +38,10 @@ Un chef que prepara por encargo, tanto para el día a día como para eventos, co
 - Panel `#/admin`: stock, precio, visible, foto, nombre, formato y agregar productos. Solo cuentas con rol de administrador.
 - WhatsApp, datos de transferencia, retiro y categorías están fijos en `src/data.js` (público).
 - Español de Chile; precios en CLP sin decimales (`$12.990`); zona horaria America/Santiago; celulares chilenos.
-- Delivery limitado a ciertas comunas. **Por definir:** cuáles.
-- **Por definir:** datos de transferencia, dirección y horario de retiro, mínimo para eventos, stock real y precio de los 5 productos ocultos.
+- Los eventos no tienen mínimo.
+- Los 5 productos sin precio se mantienen ocultos por ahora, y los datos de transferencia no se publican por ahora (decisión del usuario, 2026-11-23).
+- Delivery limitado a ciertas comunas; **aún no definidas**: no listarlas.
+- **Por definir:** dirección y horario de retiro, y stock real.
 
 ## Brand Commitments
 
@@ -53,7 +55,7 @@ Un chef que prepara por encargo, tanto para el día a día como para eventos, co
 - Catálogo y precios entregados por el usuario: `supabase/schema.sql` (los valores vigentes están en Supabase).
 - Logo en PNG de 641 × 394 px. No hay versión vectorial.
 - No hay fotos de productos en el repositorio, testimonios, reseñas, prensa, resolución sanitaria ni clientes citables. No inventarlos.
-- Por confirmar con el usuario: los textos "mini pampitas" y "chandell" de los menús de eventos.
+- "Mini pampitas" y "chandell" están bien escritos (confirmado por el usuario): no corregirlos.
 
 ## Product Principles
 

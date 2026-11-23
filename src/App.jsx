@@ -4,6 +4,7 @@ import { supabase, urlFoto } from './supabase.js'
 import { cambiar, precio, resumen } from './cart.js'
 import { guardar, leer } from './almacen.js'
 import Paso from './Paso.jsx'
+import Pedido from './Pedido.jsx'
 
 const CLAVE = 'chef-diego-pedido'
 
@@ -89,12 +90,17 @@ export default function App() {
   useEffect(() => guardar(CLAVE, carrito), [carrito])
 
   const cargar = async () => {
-    setError(false)
     const { data, error } = await supabase.from('productos').select('*').eq('activo', true).order('orden')
-    if (error) { console.error(error); setError(true); return }
+      .abortSignal(AbortSignal.timeout(15000))
+    if (error) { console.error(error); return null }
     setProductos(data)
+    return data
   }
-  useEffect(() => { cargar() }, [])
+  const cargarCarta = async () => {
+    setError(false)
+    if (!(await cargar())) setError(true)
+  }
+  useEffect(() => { cargarCarta() }, [])
 
   const categorias = useMemo(() => CATEGORIAS.filter((c) => productos?.some((p) => p.categoria === c.id)), [productos])
   // Mientras no hay productos el pedido guardado no se toca ni se da por agotado.
@@ -105,6 +111,12 @@ export default function App() {
   const onCambiar = (producto, delta) => {
     setCarrito((c) => cambiar(c, producto, delta))
     setAviso(`${delta > 0 ? 'Agregaste' : 'Quitaste'} ${producto.nombre}`)
+  }
+
+  const fijarAjuste = (r) => setCarrito(Object.fromEntries(r.lineas.map((l) => [l.producto.id, l.cantidad])))
+  const cerrar = () => {
+    setAbierto(false)
+    if (res.ajustado) fijarAjuste(res) // ya se le avisó
   }
 
   useEffect(() => {
@@ -132,7 +144,7 @@ export default function App() {
         {error && (
           <div className="estado" role="alert">
             <p>No pudimos cargar la carta. Revisa tu conexión a internet.</p>
-            <button type="button" className="agregar" onClick={cargar}>Reintentar</button>
+            <button type="button" className="agregar" onClick={cargarCarta}>Reintentar</button>
           </div>
         )}
         {!error && !productos && <p className="estado" role="status">Cargando la carta…</p>}
@@ -166,6 +178,8 @@ export default function App() {
         </div>
       )}
       <p className="solo-lector" aria-live="polite">{aviso}</p>
+      <Pedido abierto={abierto} onCerrar={cerrar} res={res} carrito={carrito} onCambiar={onCambiar}
+        onAjustar={fijarAjuste} onVaciar={() => { setCarrito({}); setAbierto(false) }} onRecargar={cargar} />
     </>
   )
 }

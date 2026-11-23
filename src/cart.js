@@ -10,7 +10,7 @@ const limpiar = (carrito) =>
 
 export function cambiar(carrito, producto, delta) {
   const { [producto.id]: actual = 0, ...resto } = limpiar(carrito)
-  const cantidad = Math.min(actual + delta, producto.stock)
+  const cantidad = Math.min(Math.min(actual, producto.stock) + delta, producto.stock)
   return cantidad > 0 ? { ...resto, [producto.id]: cantidad } : resto
 }
 

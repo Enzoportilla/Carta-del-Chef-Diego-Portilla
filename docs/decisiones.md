@@ -11,3 +11,4 @@
 | 2026-11-23 | El panel exige `app_metadata.rol = admin` en RLS | Aunque el registro público quede abierto, nadie más puede editar |
 | 2026-11-23 | El stock no baja solo con cada pedido; se vuelve a consultar justo antes de enviar | El público no puede escribir en la base |
 | 2026-11-23 | Títulos en Cinzel y texto en Lato | Cinzel sigue las versalitas del logo |
+| 2026-11-23 | "Confirmar pedido" revisa el stock y luego muestra un enlace "Enviar por WhatsApp" junto a los datos de transferencia | Abrir la ventana por código falla dentro de Instagram y Facebook; un enlace real funciona siempre |

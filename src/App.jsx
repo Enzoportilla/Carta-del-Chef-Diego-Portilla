@@ -87,14 +87,23 @@ export default function App() {
   const [activa, setActiva] = useState(null)
   const [abierto, setAbierto] = useState(false)
   const [aviso, setAviso] = useState('')
+  const [ajuste, setAjuste] = useState(false)
   useEffect(() => guardar(CLAVE, carrito), [carrito])
 
   const cargar = async () => {
-    const { data, error } = await supabase.from('productos').select('*').eq('activo', true).order('orden')
-      .abortSignal(AbortSignal.timeout(15000))
-    if (error) { console.error(error); return null }
-    setProductos(data)
-    return data
+    const corte = new AbortController() // AbortSignal.timeout no existe en iOS 15
+    const reloj = setTimeout(() => corte.abort(), 15000)
+    try {
+      const { data, error } = await supabase.from('productos').select('*').eq('activo', true).order('orden').abortSignal(corte.signal)
+      if (error) throw error
+      setProductos(data)
+      return data
+    } catch (e) {
+      console.error(e)
+      return null
+    } finally {
+      clearTimeout(reloj)
+    }
   }
   const cargarCarta = async () => {
     setError(false)
@@ -106,18 +115,18 @@ export default function App() {
   // Mientras no hay productos el pedido guardado no se toca ni se da por agotado.
   const res = useMemo(() => resumen(productos ? carrito : {}, productos ?? []), [carrito, productos])
   const cantidades = Object.fromEntries(res.lineas.map((l) => [l.producto.id, l.cantidad]))
-  const hayPedido = res.lineas.length > 0 || res.ajustado
 
   const onCambiar = (producto, delta) => {
     setCarrito((c) => cambiar(c, producto, delta))
     setAviso(`${delta > 0 ? 'Agregaste' : 'Quitaste'} ${producto.nombre}`)
   }
 
-  const fijarAjuste = (r) => setCarrito(Object.fromEntries(r.lineas.map((l) => [l.producto.id, l.cantidad])))
-  const cerrar = () => {
-    setAbierto(false)
-    if (res.ajustado) fijarAjuste(res) // ya se le avisó
-  }
+  // Si algo se agotó o bajó de stock, el pedido se corrige y queda el aviso hasta que lo cierre.
+  useEffect(() => {
+    if (!res.ajustado) return
+    setCarrito(Object.fromEntries(res.lineas.map((l) => [l.producto.id, l.cantidad])))
+    setAjuste(true)
+  }, [res])
 
   useEffect(() => {
     if (!categorias.length) return
@@ -168,18 +177,26 @@ export default function App() {
         </footer>
       )}
 
-      {hayPedido && (
+      {(res.lineas.length > 0 || ajuste) && (
         <div className="barra">
-          <button type="button" onClick={() => setAbierto(true)}>
-            <span>Ver mi pedido</span>
-            <span className="barra__cuenta">{res.unidades}</span>
-            <span className="barra__total">{precio(res.total)}</span>
-          </button>
+          {ajuste && (
+            <div className="barra__ajuste" role="status">
+              <p>Cambió el stock: actualizamos tu pedido.</p>
+              <button type="button" className="cerrar" onClick={() => setAjuste(false)}>Entendido</button>
+            </div>
+          )}
+          {res.lineas.length > 0 && (
+            <button type="button" className="barra__ver" onClick={() => setAbierto(true)}>
+              <span>Ver mi pedido</span>
+              <span className="barra__cuenta">{res.unidades}</span>
+              <span className="barra__total">{precio(res.total)}</span>
+            </button>
+          )}
         </div>
       )}
       <p className="solo-lector" aria-live="polite">{aviso}</p>
-      <Pedido abierto={abierto} onCerrar={cerrar} res={res} carrito={carrito} onCambiar={onCambiar}
-        onAjustar={fijarAjuste} onVaciar={() => { setCarrito({}); setAbierto(false) }} onRecargar={cargar} />
+      <Pedido abierto={abierto} onCerrar={() => { setAbierto(false); setAjuste(false) }} res={res} ajuste={ajuste} carrito={carrito}
+        onCambiar={onCambiar} onVaciar={() => { setCarrito({}); setAbierto(false) }} onRecargar={cargar} />
     </>
   )
 }

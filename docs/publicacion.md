@@ -4,9 +4,9 @@
 
 1. **Supabase → SQL Editor:** pegar y ejecutar `supabase/schema.sql`.
 2. **Authentication → Users → Add user → Create new user:** correo y contraseña del chef, con *Auto Confirm User*.
-3. **SQL Editor**, para darle el rol (no se sube al repo):
+3. **SQL Editor**, para darle el rol (no se sube al repo). Debe devolver una fila; si no, el correo no coincide:
    ```sql
-   update auth.users set raw_app_meta_data = raw_app_meta_data || '{"rol":"admin"}' where email = 'CORREO_DEL_CHEF';
+   update auth.users set raw_app_meta_data = raw_app_meta_data || '{"rol":"admin"}' where email = lower('CORREO_DEL_CHEF') returning email;
    ```
 4. **Authentication → Sign In / Providers:** desactivar *Allow new users to sign up*.
 5. **Project Settings → API Keys:** copiar la clave *publishable/anon* (no la `service_role`/`secret`). Local: `cp .env.example .env` y pegarla. URL: `https://tzvzkfdztzvvlbqnsheh.supabase.co`.

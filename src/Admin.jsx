@@ -43,20 +43,25 @@ function Fila({ p, onGuardar, onFoto, onAviso }) {
   useEffect(() => setPrecioTxt(String(p.precio_clp ?? '')), [p.precio_clp])
 
   const guardarStock = () => {
-    const n = stockTxt.trim() === '' ? NaN : Number(stockTxt.replace(',', '.'))
-    if (Number.isInteger(n) && n >= 0) return n !== p.stock && onGuardar(p.id, { stock: n })
-    setStockTxt(String(p.stock))
-    onAviso('El stock debe ser un número entero.')
+    if (/^\d+$/.test(stockTxt.trim())) {
+      const n = Number(stockTxt)
+      setStockTxt(String(n))
+      if (n !== p.stock) onGuardar(p, { stock: n })
+    } else {
+      setStockTxt(String(p.stock))
+      onAviso('El stock debe ser un número entero, sin puntos ni comas.')
+    }
   }
   const guardarPrecio = () => {
-    const digitos = precioTxt.replace(/\D/g, '') // acepta 2.000 y $2000
-    const n = digitos ? Number(digitos) : null
-    if (n === null && (p.activo || precioTxt.trim())) {
+    const texto = precioTxt.replace(/[$\s]/g, '')
+    const valido = /^(\d+|\d{1,3}(\.\d{3})+)$/.test(texto) // 2000 o 2.000
+    const n = valido ? Number(texto.replaceAll('.', '')) : null
+    if (texto ? !n : p.activo) {
       setPrecioTxt(String(p.precio_clp ?? ''))
-      return onAviso(precioTxt.trim() ? 'El precio debe ser un número.' : 'Oculta el producto antes de quitar el precio.')
+      return onAviso(texto ? 'El precio debe ser un número mayor que cero, sin decimales.' : 'Oculta el producto antes de quitar el precio.')
     }
-    setPrecioTxt(digitos)
-    if (n !== p.precio_clp) onGuardar(p.id, { precio_clp: n })
+    setPrecioTxt(String(n ?? ''))
+    if (n !== p.precio_clp) onGuardar(p, { precio_clp: n })
   }
   const elegirFoto = async (e) => {
     const [archivo] = e.target.files
@@ -83,46 +88,58 @@ function Fila({ p, onGuardar, onFoto, onAviso }) {
             : p.stock === 0 && <p className="aviso">Agotado</p>}
       </div>
       <div className="paso" role="group" aria-label={`Stock de ${p.nombre}`}>
-        <button type="button" disabled={p.stock === 0} onClick={() => onGuardar(p.id, { stock: p.stock - 1 })} aria-label={`Restar stock de ${p.nombre}`}>−</button>
+        <button type="button" disabled={p.stock === 0} onClick={() => onGuardar(p, { stock: p.stock - 1 })} aria-label={`Restar stock de ${p.nombre}`}>−</button>
         <input inputMode="numeric" value={stockTxt} aria-label={`Stock de ${p.nombre}`} onChange={(e) => setStockTxt(e.target.value)} onBlur={guardarStock} onKeyDown={alEnter} />
-        <button type="button" onClick={() => onGuardar(p.id, { stock: p.stock + 1 })} aria-label={`Sumar stock de ${p.nombre}`}>+</button>
+        <button type="button" onClick={() => onGuardar(p, { stock: p.stock + 1 })} aria-label={`Sumar stock de ${p.nombre}`}>+</button>
       </div>
       <label className="fila__precio">
         <span aria-hidden="true">$</span>
         <input inputMode="numeric" value={precioTxt} aria-label={`Precio de ${p.nombre}`} onChange={(e) => setPrecioTxt(e.target.value)} onBlur={guardarPrecio} onKeyDown={alEnter} />
       </label>
       <label className="fila__visible">
-        <input type="checkbox" checked={p.activo} disabled={p.precio_clp === null} onChange={(e) => onGuardar(p.id, { activo: e.target.checked })} />
+        <input type="checkbox" checked={p.activo} disabled={p.precio_clp === null} onChange={(e) => onGuardar(p, { activo: e.target.checked })} />
         <span>Visible</span>
       </label>
     </li>
   )
 }
 
+const FALLO = 'No se guardó el cambio'
+
 function Panel() {
-  const [filas, setFilas] = useState(null)
+  const [guardadas, setGuardadas] = useState(null) // lo que está en la base
+  const [pendientes, setPendientes] = useState([]) // cambios aún sin confirmar, en orden
   const [aviso, setAviso] = useState('')
   const cola = useRef(Promise.resolve())
 
   const cargar = async () => {
     const { data, error } = await supabase.from('productos').select('*').order('orden')
     if (error) return setAviso('No se pudo cargar la lista. Revisa tu conexión y recarga la página.')
-    setFilas(data)
+    setGuardadas(data)
   }
   useEffect(() => { cargar() }, [])
 
-  // Optimista y en orden: cada cambio espera al anterior, así el último toque es el que queda.
-  const guardar = (id, cambios) => {
-    setAviso('')
-    setFilas((fs) => fs.map((f) => (f.id === id ? { ...f, ...cambios } : f)))
+  // Se ve lo guardado más lo pendiente: si un cambio falla, al sacarlo de pendientes vuelve el valor real.
+  const aplicar = (fs, { id, cambios }) => fs.map((f) => (f.id === id ? { ...f, ...cambios } : f))
+  const filas = guardadas && pendientes.reduce(aplicar, guardadas)
+
+  // En orden: cada cambio espera al anterior, así el último toque es el que queda.
+  const guardar = ({ id, nombre }, cambios) => {
+    const cambio = { id, cambios }
+    if (!pendientes.length) setAviso('')
+    setPendientes((ps) => [...ps, cambio])
     cola.current = cola.current.then(async () => {
       // single(): sin permiso o con la sesión vencida RLS actualiza 0 filas sin dar error.
       const { error } = await supabase.from('productos').update(cambios).eq('id', id).select().single()
-      if (!error) { setAviso('Guardado'); return true }
-      console.error(error)
-      await cargar()
-      setAviso('No se guardó el cambio. Inténtalo de nuevo.')
-      return false
+      setPendientes((ps) => ps.filter((c) => c !== cambio))
+      if (error) {
+        console.error(error)
+        setAviso(`${FALLO} de ${nombre}. Inténtalo de nuevo.`)
+        return false
+      }
+      setGuardadas((fs) => aplicar(fs, cambio))
+      setAviso((a) => (a.startsWith(FALLO) ? a : 'Guardado')) // un acierto posterior no tapa la falla
+      return true
     })
     return cola.current
   }
@@ -135,7 +152,7 @@ function Panel() {
     const ruta = `${p.id}-${Date.now()}.jpg`
     const { error } = await bucket.upload(ruta, foto, { contentType: 'image/jpeg' })
     if (error) { console.error(error); return setAviso('No se pudo subir la foto. Inténtalo de nuevo.') }
-    const guardada = await guardar(p.id, { foto: ruta })
+    const guardada = await guardar(p, { foto: ruta })
     const sobrante = guardada ? p.foto : ruta
     if (sobrante) await bucket.remove([sobrante])
   }

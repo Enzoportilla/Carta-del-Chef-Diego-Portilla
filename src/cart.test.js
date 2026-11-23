@@ -14,6 +14,10 @@ test('cambiar suma, topa en el stock y elimina en cero', () => {
   assert.deepEqual(cart.cambiar({ roscas: 1, fugazza: 1 }, p('roscas', 2000, 2), -1), { fugazza: 1 })
 })
 
+test('cambiar parte de la cantidad que se ve: lo guardado sobre el stock se topa antes de restar', () => {
+  assert.deepEqual(cart.cambiar({ roscas: 9 }, p('roscas', 2000, 3), -1), { roscas: 2 })
+})
+
 test('resumen suma subtotales y unidades', () => {
   const r = cart.resumen({ fugazza: 2, roscas: 1 }, [p('fugazza', 2000, 5), p('roscas', 2500, 5)])
   assert.equal(r.total, 6500)

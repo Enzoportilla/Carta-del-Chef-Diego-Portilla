@@ -30,14 +30,14 @@ const datosTransferencia = (total) => [
   ['RUT', TRANSFERENCIA.rut], ['Nombre', TRANSFERENCIA.titular], ['Correo', TRANSFERENCIA.correo], ['Monto', total],
 ].filter(([, v]) => v)
 
-// Lo que se acaba de enviar: se muestra tal cual aunque el carrito cambie después.
+// Lo que se acaba de confirmar: se muestra tal cual aunque el carrito cambie después.
 function Confirmacion({ enviado, onCopiar, onVaciar, aviso }) {
   const datos = TRANSFERENCIA && datosTransferencia(precio(enviado.total))
   return (
     <>
-      <p>Envía el mensaje en WhatsApp para que el chef reciba tu pedido.{' '}
-        <a href={enviado.url} target="_blank" rel="noopener">{enviado.abierto ? 'Abrir WhatsApp de nuevo' : 'Abrir WhatsApp'}</a>
-      </p>
+      <p>Envía el mensaje para que el chef reciba tu pedido.</p>
+      {/* Enlace real y no window.open: funciona también dentro de Instagram y Facebook. */}
+      <a className="enviar" href={enviado.url} target="_blank" rel="noopener">Enviar por WhatsApp</a>
       {datos ? (
         <section className="transferencia" aria-labelledby="transferencia-titulo">
           <h3 id="transferencia-titulo">Datos para transferir</h3>
@@ -52,7 +52,7 @@ function Confirmacion({ enviado, onCopiar, onVaciar, aviso }) {
   )
 }
 
-export default function Pedido({ abierto, onCerrar, res, carrito, onCambiar, onAjustar, onVaciar, onRecargar }) {
+export default function Pedido({ abierto, onCerrar, res, ajuste, carrito, onCambiar, onVaciar, onRecargar }) {
   const dialogo = useRef(null)
   const formulario = useRef(null)
   const [datos, setDatos] = useState(leerDatos)
@@ -71,28 +71,16 @@ export default function Pedido({ abierto, onCerrar, res, carrito, onCambiar, onA
   const texto = (k) => ({ ...campo(k), required: true, pattern: '.*\\S.*', title: 'Completa este campo' })
   const mensaje = mensajePedido(res, datos)
 
-  const enviar = async (e) => {
+  const confirmar = async (e) => {
     e.preventDefault()
     if (!NEGOCIO.whatsapp || enviando) return
-    // Se abre dentro del toque para que el navegador no la bloquee; la dirección se asigna al confirmar el stock.
-    const ventana = window.open('', '_blank')
-    if (ventana) { ventana.opener = null; ventana.document.body.textContent = 'Abriendo WhatsApp…' }
     setEnviando(true); setAviso('')
     const actuales = await onRecargar()
     setEnviando(false)
-    if (!actuales) {
-      ventana?.close()
-      return setAviso('No pudimos confirmar el stock. Revisa tu conexión y vuelve a enviar.')
-    }
+    if (!actuales) return setAviso('No pudimos confirmar el stock. Revisa tu conexión y vuelve a intentarlo.')
     const ahora = resumen(carrito, actuales)
-    if (ahora.ajustado) onAjustar(ahora)
-    if (mensajePedido(ahora, datos) !== mensaje) {
-      ventana?.close()
-      return setAviso('Cambió la carta y actualizamos tu pedido. Revísalo y vuelve a enviarlo.')
-    }
-    const url = enlaceWhatsApp(NEGOCIO.whatsapp, mensaje)
-    if (ventana) ventana.location.href = url
-    setEnviado({ url, total: ahora.total, delivery: datos.entrega === 'delivery', abierto: Boolean(ventana) })
+    if (mensajePedido(ahora, datos) !== mensaje) return setAviso('Cambió la carta y actualizamos tu pedido. Revísalo y vuelve a confirmar.')
+    setEnviado({ url: enlaceWhatsApp(NEGOCIO.whatsapp, mensaje), total: ahora.total, delivery: datos.entrega === 'delivery' })
     dialogo.current.scrollTo(0, 0)
   }
 
@@ -104,13 +92,13 @@ export default function Pedido({ abierto, onCerrar, res, carrito, onCambiar, onA
       onClick={(e) => e.target === dialogo.current && onCerrar()}>
       <div className="pedido__hoja">
         <header className="pedido__cabeza">
-          <h2 id="pedido-titulo">{enviado ? 'Pedido listo' : 'Tu pedido'}</h2>
+          <h2 id="pedido-titulo">{enviado ? 'Falta un paso' : 'Tu pedido'}</h2>
           <button type="button" className="cerrar" onClick={onCerrar}>Cerrar</button>
         </header>
 
         {enviado ? <Confirmacion enviado={enviado} onCopiar={copiarYAvisar} onVaciar={onVaciar} aviso={aviso} /> : (
-          <form ref={formulario} onSubmit={enviar}>
-            {res.ajustado && <p className="aviso" role="status">Cambió el stock: actualizamos tu pedido.</p>}
+          <form ref={formulario} onSubmit={confirmar} inert={enviando ? '' : undefined}>
+            {ajuste && !aviso && <p className="aviso" role="status">Cambió el stock: actualizamos tu pedido.</p>}
             {res.lineas.length === 0 ? (
               <>
                 <p>Tu pedido está vacío. Vuelve a la carta y toca Agregar.</p>
@@ -157,7 +145,7 @@ export default function Pedido({ abierto, onCerrar, res, carrito, onCambiar, onA
                 <label className="campo"><span>Comentario (opcional)</span><textarea rows={2} {...campo('comentario')} /></label>
 
                 <p className="aviso" role="status">{aviso}</p>
-                <button type="submit" className="enviar" disabled={!NEGOCIO.whatsapp || enviando}>{enviando ? 'Confirmando stock…' : 'Enviar por WhatsApp'}</button>
+                <button type="submit" className="enviar" disabled={!NEGOCIO.whatsapp || enviando}>{enviando ? 'Confirmando stock…' : 'Confirmar pedido'}</button>
                 {!NEGOCIO.whatsapp && <p className="nota">El envío por WhatsApp aún no está disponible. Puedes copiar el mensaje.</p>}
                 <button type="button" className="agregar" onClick={() => formulario.current.reportValidity() && copiarYAvisar(mensaje, 'Mensaje copiado.')}>Copiar mensaje</button>
                 <p className="nota">Pagas por transferencia bancaria.</p>

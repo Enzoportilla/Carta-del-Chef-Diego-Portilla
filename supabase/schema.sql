@@ -6,7 +6,7 @@ create table if not exists public.productos (
   categoria   text not null check (categoria in ('panes', 'sopaipillas', 'dulces', 'salados')), -- ver src/data.js
   nombre      text not null,
   formato     text,                                             -- qué trae el pack, p. ej. '5 unidades de 70 g'
-  precio_clp  integer check (precio_clp >= 0),                  -- precio del pack; null = falta definirlo
+  precio_clp  integer check (precio_clp > 0),                   -- precio del pack; null = falta definirlo
   stock       integer not null default 0 check (stock >= 0),    -- en packs
   descripcion text,
   foto        text,                                             -- ruta en el bucket 'fotos'

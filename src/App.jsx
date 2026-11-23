@@ -68,7 +68,7 @@ function Producto({ producto, cantidad, onCambiar }) {
           <span className="puntos" aria-hidden="true" />
           <p className="precio">{precio(producto.precio_clp)}</p>
         </div>
-        {producto.descripcion && <p className="producto__desc">{producto.descripcion}</p>}
+        {producto.descripcion?.split('\n').map((linea, i) => <p key={i} className="producto__desc">{linea}</p>)}
         <div className="producto__pie">
           <p>{producto.formato}</p>
           {agotado ? <p className="agotado">Agotado</p>

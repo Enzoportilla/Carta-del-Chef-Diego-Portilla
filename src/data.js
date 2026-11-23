@@ -15,4 +15,5 @@ export const CATEGORIAS = [
   { id: 'sopaipillas', nombre: 'Sopaipillas' },
   { id: 'dulces', nombre: 'Dulces' },
   { id: 'salados', nombre: 'Salados y masas' },
+  { id: 'eventos', nombre: 'Eventos' },
 ]

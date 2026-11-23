@@ -60,6 +60,7 @@ Un panel de administración permite al chef gestionar productos y stock.
 - [x] Tipografías: Cinzel y Lato
 - [x] Catálogo inicial (`supabase/schema.sql`; faltan precios, fotos y stock real)
 - [x] Construir carta + carrito
+- [x] Sección Eventos (menús por persona y paquetes de 100)
 - [x] Checkout WhatsApp (faltan datos de transferencia en `src/data.js`)
 - [x] Panel `#/admin`: stock, precio, visible, fotos, agregar productos y editar nombre y formato
 - [ ] Panel: editar descripción, categorías, configuración

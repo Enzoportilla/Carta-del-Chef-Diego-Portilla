@@ -17,3 +17,5 @@
 | 2026-11-23 | Diseño claro: portada negra con el logo y carta sobre blanco nieve; el "+" reemplaza al botón "Agregar" | Pedido del usuario: que se vea más ligero |
 | 2026-11-23 | El panel permite agregar productos (no borrarlos: se ocultan con "Visible"). El id sale del nombre, así no se repiten | Pedido del usuario |
 | 2026-11-23 | Nombre y formato se editan en la lista del panel; el id no cambia al renombrar y no se permiten nombres repetidos | Pedido del usuario; el id fijo conserva los carritos guardados y las fotos |
+| 2026-11-23 | Eventos es una categoría más: los menús se piden por persona y los paquetes por 100 unidades; la cantidad se puede escribir | Usa el mismo carrito, mensaje y panel; el chef puede cambiar precios y agregar menús |
+| 2026-11-23 | Stock 999 en eventos equivale a sin límite | Se hacen por encargo; en 0 se muestra "Agotado" |

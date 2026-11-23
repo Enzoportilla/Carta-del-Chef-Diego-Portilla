@@ -1,0 +1,7 @@
+# Mantener finales de línea LF (el contenedor es Linux; evita problemas al editar desde Windows)
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary

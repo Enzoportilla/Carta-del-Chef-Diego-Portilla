@@ -1,0 +1,53 @@
+{
+  "name": "Carta Chef Diego Portilla",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22-bookworm",
+
+  "features": {
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {},
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  "remoteUser": "node",
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+
+  "mounts": [
+    "source=claude-code-config-${devcontainerId},target=/home/node/.claude,type=volume",
+    "source=carta-node-modules-${devcontainerId},target=/workspace/node_modules,type=volume"
+  ],
+
+  "containerEnv": {
+    "CLAUDE_CONFIG_DIR": "/home/node/.claude",
+    "TZ": "America/Santiago",
+    "LANG": "es_CL.UTF-8"
+  },
+
+  "forwardPorts": [5173, 3000, 4173, 8080],
+  "portsAttributes": {
+    "5173": { "label": "Dev server (Vite)", "onAutoForward": "notify" },
+    "3000": { "label": "App / API", "onAutoForward": "notify" },
+    "4173": { "label": "Preview build", "onAutoForward": "silent" },
+    "8080": { "label": "Servidor estático", "onAutoForward": "silent" }
+  },
+
+  "postCreateCommand": "sudo chown -R node:node /home/node/.claude /workspace/node_modules && git config --global --add safe.directory /workspace",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "anthropic.claude-code",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "ritwickdey.LiveServer"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "files.eol": "\n",
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  }
+}

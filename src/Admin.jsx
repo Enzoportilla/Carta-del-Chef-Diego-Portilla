@@ -2,6 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 import { supabase, urlFoto } from './supabase.js'
 import { CATEGORIAS } from './data.js'
 
+const ERRORES_LOGIN = {
+  invalid_credentials: 'Correo o contraseña incorrectos.',
+  email_not_confirmed: 'Esta cuenta aún no está confirmada. Confírmala en Supabase.',
+  over_request_rate_limit: 'Demasiados intentos. Espera unos minutos.',
+}
+
 function Login() {
   const [error, setError] = useState('')
   const [enviando, setEnviando] = useState(false)
@@ -12,7 +18,7 @@ function Login() {
     setEnviando(true); setError('')
     const { error } = await supabase.auth.signInWithPassword({ email: f.get('correo'), password: f.get('clave') })
     setEnviando(false)
-    if (error) setError(error.status === 400 ? 'Correo o contraseña incorrectos.' : 'No se pudo entrar. Revisa tu conexión.')
+    if (error) setError(ERRORES_LOGIN[error.code] ?? (error.code ? `No se pudo entrar (${error.code}).` : 'No se pudo entrar. Revisa tu conexión.'))
   }
 
   return (

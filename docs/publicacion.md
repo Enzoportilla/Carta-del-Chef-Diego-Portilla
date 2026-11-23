@@ -22,3 +22,15 @@
 - Desde un celular: agregar, recargar, enviar por delivery y por retiro; el mensaje llega completo al WhatsApp del chef.
 - Stock en 0 desde el panel → aparece "Agotado" al recargar la carta.
 - Subir y reemplazar una foto desde el celular.
+
+## Si no puedes entrar al panel
+
+La cuenta del panel se crea en *Authentication → Users*; no es la cuenta con la que entras a supabase.com ni a GitHub.
+Revisar en SQL Editor:
+```sql
+select email, email_confirmed_at is not null as confirmada, raw_app_meta_data->>'rol' as rol from auth.users;
+```
+- **No aparece el correo:** crear el usuario (paso 2) y darle el rol (paso 3).
+- **`confirmada` = false:** `update auth.users set email_confirmed_at = now() where email = lower('CORREO_DEL_CHEF');`
+- **`rol` vacío:** repetir el paso 3, salir del panel y volver a entrar.
+- **Todo bien:** la contraseña no coincide. Borrar el usuario, crearlo de nuevo (paso 2) y darle el rol (paso 3).

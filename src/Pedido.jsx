@@ -38,7 +38,7 @@ function Confirmacion({ enviado, onCopiar, onVaciar, aviso }) {
     <>
       <p>Envía el mensaje para que el chef reciba tu pedido.</p>
       {/* Enlace real y no window.open: funciona también dentro de Instagram y Facebook. */}
-      <a className="enviar" href={enviado.url} target="_blank" rel="noopener">Enviar por WhatsApp</a>
+      <a className="enviar enviar--whatsapp" href={enviado.url} target="_blank" rel="noopener">Enviar por WhatsApp</a>
       <p className="nota">{COORDINAR}</p>
       {datos && (
         <section className="transferencia" aria-labelledby="transferencia-titulo">

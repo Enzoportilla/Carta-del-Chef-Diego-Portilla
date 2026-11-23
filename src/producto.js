@@ -13,3 +13,13 @@ export const leerStock = (texto) => (/^\d+$/.test(texto.trim()) ? Number(texto) 
 // 'Pan árabe' → 'pan-arabe'
 export const idDesdeNombre = (nombre) =>
   nombre.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+
+// El id no cambia al renombrar, así que puede estar ocupado por un producto que ya se llama distinto.
+export function idLibre(id, ids) {
+  let libre = id
+  for (let n = 2; ids.includes(libre); n++) libre = `${id}-${n}`
+  return libre
+}
+
+export const nombreRepetido = (nombre, filas, idPropio) =>
+  filas.some((f) => f.id !== idPropio && idDesdeNombre(f.nombre) === idDesdeNombre(nombre))

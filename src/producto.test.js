@@ -17,3 +17,15 @@ test('stock: entero desde cero', () => {
   for (const [t, n] of [['0', 0], [' 12 ', 12]]) assert.equal(producto.leerStock(t), n, t)
   for (const t of ['', '-1', '2,5', '1.000', '0x10', 'x']) assert.equal(producto.leerStock(t), undefined, t)
 })
+
+test('id libre: agrega un número si un producto renombrado todavía ocupa el id', () => {
+  assert.equal(producto.idLibre('fugazza', ['roscas']), 'fugazza')
+  assert.equal(producto.idLibre('fugazza', ['fugazza', 'fugazza-2']), 'fugazza-3')
+})
+
+test('nombre repetido: ignora tildes, mayúsculas y el propio producto', () => {
+  const filas = [{ id: 'a', nombre: 'Pan árabe' }, { id: 'b', nombre: 'Roscas' }]
+  assert.equal(producto.nombreRepetido('PAN ARABE', filas), true)
+  assert.equal(producto.nombreRepetido('Pan Arabe', filas, 'a'), false)
+  assert.equal(producto.nombreRepetido('Queque', filas), false)
+})

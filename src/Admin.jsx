@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase, urlFoto } from './supabase.js'
 import { CATEGORIAS } from './data.js'
-import { idDesdeNombre, leerPrecio, leerStock } from './producto.js'
+import { idDesdeNombre, idLibre, leerPrecio, leerStock, nombreRepetido } from './producto.js'
 
 const ERRORES_LOGIN = {
   invalid_credentials: 'Correo o contraseña incorrectos.',
@@ -10,6 +10,8 @@ const ERRORES_LOGIN = {
 }
 
 const STOCK_MALO = 'El stock debe ser un número entero, sin puntos ni comas.'
+const NOMBRE_MALO = 'Escribe un nombre con letras o números.'
+const NOMBRE_REPETIDO = 'Ya existe un producto con ese nombre.'
 const PRECIO_MALO = 'El precio debe ser un número mayor que cero, sin decimales.'
 
 function Login() {
@@ -45,13 +47,29 @@ async function prepararFoto(archivo) {
   return new Promise((ok, mal) => lienzo.toBlob((b) => (b ? ok(b) : mal(new Error('sin imagen'))), 'image/jpeg', 0.85))
 }
 
-function Fila({ p, onGuardar, onFoto, onAviso }) {
+function Fila({ p, repetido, onGuardar, onFoto, onAviso }) {
+  const [nombreTxt, setNombreTxt] = useState(p.nombre)
+  const [formatoTxt, setFormatoTxt] = useState(p.formato ?? '')
   const [stockTxt, setStockTxt] = useState(String(p.stock))
   const [precioTxt, setPrecioTxt] = useState(String(p.precio_clp ?? ''))
   const [subiendo, setSubiendo] = useState(false)
+  useEffect(() => setNombreTxt(p.nombre), [p.nombre])
+  useEffect(() => setFormatoTxt(p.formato ?? ''), [p.formato])
   useEffect(() => setStockTxt(String(p.stock)), [p.stock])
   useEffect(() => setPrecioTxt(String(p.precio_clp ?? '')), [p.precio_clp])
 
+  const guardarNombre = () => {
+    const nombre = nombreTxt.trim()
+    const problema = !idDesdeNombre(nombre) ? NOMBRE_MALO : repetido(nombre, p.id) && NOMBRE_REPETIDO
+    setNombreTxt(problema ? p.nombre : nombre)
+    if (problema) onAviso(problema)
+    else if (nombre !== p.nombre) onGuardar(p, { nombre })
+  }
+  const guardarFormato = () => {
+    const formato = formatoTxt.trim() || null
+    setFormatoTxt(formato ?? '')
+    if (formato !== p.formato) onGuardar(p, { formato })
+  }
   const guardarStock = () => {
     const n = leerStock(stockTxt)
     setStockTxt(String(n ?? p.stock))
@@ -85,8 +103,8 @@ function Fila({ p, onGuardar, onFoto, onAviso }) {
         <input type="file" accept="image/*" disabled={subiendo} onChange={elegirFoto} aria-label={`Foto de ${p.nombre}`} />
       </label>
       <div className="fila__nombre">
-        <h3>{p.nombre}</h3>
-        <p className="nota">{p.formato}</p>
+        <input className="fila__titulo" value={nombreTxt} maxLength={60} aria-label={`Nombre de ${p.nombre}`} onChange={(e) => setNombreTxt(e.target.value)} onBlur={guardarNombre} onKeyDown={alEnter} />
+        <input value={formatoTxt} maxLength={60} placeholder="Agregar formato" aria-label={`Formato de ${p.nombre}`} onChange={(e) => setFormatoTxt(e.target.value)} onBlur={guardarFormato} onKeyDown={alEnter} />
         {p.precio_clp === null ? <p className="aviso">Falta el precio</p>
           : !p.activo ? <p className="aviso">Oculto</p>
             : p.stock === 0 && <p className="aviso">Agotado</p>}
@@ -108,7 +126,7 @@ function Fila({ p, onGuardar, onFoto, onAviso }) {
   )
 }
 
-function Nuevo({ onAgregar, onAviso }) {
+function Nuevo({ repetido, onAgregar, onAviso }) {
   const plegable = useRef(null)
   const ocupado = useRef(false) // el estado llega tarde para frenar un doble toque
   const [agregando, setAgregando] = useState(false)
@@ -121,7 +139,8 @@ function Nuevo({ onAgregar, onAviso }) {
     const id = idDesdeNombre(d.nombre)
     const precio_clp = leerPrecio(d.precio)
     const stock = leerStock(d.stock)
-    if (!id) return onAviso('Escribe un nombre con letras o números.')
+    if (!id) return onAviso(NOMBRE_MALO)
+    if (repetido(d.nombre)) return onAviso(NOMBRE_REPETIDO)
     if (precio_clp === undefined) return onAviso(PRECIO_MALO)
     if (stock === undefined) return onAviso(STOCK_MALO)
     ocupado.current = true; setAgregando(true)
@@ -173,6 +192,8 @@ function Panel() {
   const aplicar = (fs, { id, cambios }) => fs.map((f) => (f.id === id ? { ...f, ...cambios } : f))
   const filas = guardadas && pendientes.reduce(aplicar, guardadas)
 
+  const repetido = (nombre, idPropio) => nombreRepetido(nombre, filas, idPropio)
+
   // En orden: cada cambio espera al anterior, así el último toque es el que queda.
   const guardar = ({ id, nombre }, cambios) => {
     const cambio = { id, cambios }
@@ -197,11 +218,11 @@ function Panel() {
   const agregar = async (producto) => {
     setAviso('')
     const orden = Math.max(0, ...guardadas.map((f) => f.orden)) + 10 // al final de su categoría
-    const { data, error } = await supabase.from('productos').insert({ ...producto, orden }).select().single()
+    const { data, error } = await supabase.from('productos').insert({ ...producto, id: idLibre(producto.id, guardadas.map((f) => f.id)), orden }).select().single()
     if (error) {
       console.error(error)
       setAviso({
-        23505: 'Ya existe un producto con ese nombre.',
+        23505: NOMBRE_REPETIDO,
         42501: 'Falta el permiso en Supabase para agregar productos, o venció la sesión. Sal y vuelve a entrar.',
       }[error.code] ?? 'No se pudo agregar el producto. Inténtalo de nuevo.')
       return false
@@ -232,11 +253,11 @@ function Panel() {
         <button type="button" className="cerrar" onClick={() => supabase.auth.signOut()}>Salir</button>
       </header>
       {!filas && !aviso && <p>Cargando…</p>}
-      {filas && <Nuevo onAgregar={agregar} onAviso={setAviso} />}
+      {filas && <Nuevo repetido={repetido} onAgregar={agregar} onAviso={setAviso} />}
       {CATEGORIAS.map((c) => (
         <section key={c.id}>
           <h2>{c.nombre}</h2>
-          <ul>{filas?.filter((f) => f.categoria === c.id).map((f) => <Fila key={f.id} p={f} onGuardar={guardar} onFoto={guardarFoto} onAviso={setAviso} />)}</ul>
+          <ul>{filas?.filter((f) => f.categoria === c.id).map((f) => <Fila key={f.id} p={f} repetido={repetido} onGuardar={guardar} onFoto={guardarFoto} onAviso={setAviso} />)}</ul>
         </section>
       ))}
       <p className="admin__aviso" role="status">{aviso}</p>

@@ -15,8 +15,8 @@ Un panel de administración permite al chef gestionar productos y stock.
    - Persistencia del carrito en el navegador (localStorage, con try/catch).
    - Resumen con subtotal y total.
 3. **Checkout por WhatsApp**
-   - Elegir **delivery** (dirección, comuna, referencias, posible costo de envío) o **retiro**.
-   - Datos del cliente: nombre y teléfono.
+   - Elegir **delivery** (dirección, comuna, referencias) o **retiro**; el pago y la entrega se coordinan por WhatsApp, sin mostrar costos de envío.
+   - Datos del cliente: nombre, apellido y teléfono.
    - Pago por **transferencia bancaria**: mostrar datos de transferencia al confirmar.
    - Generar un mensaje de pedido ordenado y abrir `https://wa.me/<numero>?text=<mensaje>`.
 4. **Panel de administración**
@@ -41,7 +41,7 @@ Un panel de administración permite al chef gestionar productos y stock.
 
 ## Identidad visual
 - Logo: `public/img/logo-chef-diego-portilla.png`. Paleta y estilo: `docs/identidad-visual.md`.
-- Estilo: negro + dorado + crema, elegante, con motivo de montañas.
+- Estilo: portada negra con el logo, carta clara (nieve, marfil y dorado), elegante, con motivo de montañas.
 
 ## Estructura de carpetas
 ```

@@ -38,18 +38,18 @@ export function telefonoInternacional(texto) {
 
 export const nombreLinea = (p) => (p.formato ? `${p.nombre} (${p.formato})` : p.nombre)
 
-export function mensajePedido({ lineas, total }, { entrega, nombre, telefono, direccion, comuna, referencias, comentario }) {
+export function mensajePedido({ lineas, total }, { entrega, nombre, apellido, telefono, direccion, comuna, referencias, comentario }) {
   const limpio = (t) => t?.trim()
   const destino = [limpio(direccion), limpio(comuna)].filter(Boolean).join(', ')
   return [
-    `Hola Chef Diego, soy ${limpio(nombre) ?? ''} y mi pedido es:`,
+    `Hola Chef Diego, soy ${[limpio(nombre), limpio(apellido)].filter(Boolean).join(' ')} y mi pedido es:`,
     '',
     ...lineas.map((l) => `- ${l.cantidad} × ${nombreLinea(l.producto)}: ${precio(l.subtotal)}`),
     '',
-    `Total: ${precio(total)}${entrega === 'delivery' ? ' más envío' : ''}`,
+    `Total: ${precio(total)}`,
     '',
     entrega === 'delivery'
-      ? `Entrega: delivery a ${destino}${limpio(referencias) ? ` (${limpio(referencias)})` : ''}. ¿Cuánto cuesta el envío?`
+      ? `Entrega: delivery a ${destino}${limpio(referencias) ? ` (${limpio(referencias)})` : ''}`
       : 'Entrega: retiro. ¿Cuándo puedo pasar?',
     'Pago: transferencia bancaria',
     `Teléfono: +${telefonoInternacional(telefono) ?? limpio(telefono) ?? ''}`,

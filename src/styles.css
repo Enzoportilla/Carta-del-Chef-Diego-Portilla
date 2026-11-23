@@ -1,108 +1,103 @@
 :root {
-  --noche: #060b0f;
-  --grafito: #13171b;
-  --crema: #f0e2b3;
-  --marfil: #f8f1cd;
-  --dorado: #af8b55;
-  --ambar: #de9a51;
-  --crema-suave: #bdb396; /* crema apagada para textos secundarios */
-  --linea: #4a3f2c;
+  --noche: #060b0f;         /* cielo del logo y texto */
+  --nieve: #fffefa;         /* fondo */
+  --marfil: #f8f1cd;        /* controles y selección */
+  --dorado: #af8b55;        /* botones principales y filos */
+  --bronce: #7a5b2b;        /* dorado legible como texto sobre nieve */
+  --ambar: #de9a51;         /* estrella */
+  --piedra: #625c50;        /* texto secundario */
+  --cobre: #94480f;         /* avisos y errores */
+  --linea: #e6dcc0;
+  --borde-campo: #978a6b;
 
   --titulo: 'Cinzel', 'Times New Roman', serif;
   --texto: 'Lato', system-ui, sans-serif;
-  --alto-cerro: 3.25rem;
-  --margen: 16px;
-  --ancho: 44rem;
+  --alto-cerro: 2.75rem;
+  --cielo: 1rem;            /* franja de cielo sobre las cumbres, donde va la estrella */
+  --margen: 18px;
+  --ancho: 40rem;
   --salida: cubic-bezier(.16, 1, .3, 1);
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: 7rem; -webkit-text-size-adjust: 100%; }
-body { margin: 0; background: var(--noche); color: var(--crema); font: 400 1.0625rem/1.5 var(--texto); }
+html { scroll-behavior: smooth; scroll-padding-top: 6rem; -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--nieve); color: var(--noche); font: 400 1.0625rem/1.5 var(--texto); }
 h1, h2, h3, p, ul { margin: 0; padding: 0; }
-h1, h2, h3 { font-family: var(--titulo); font-weight: 600; line-height: 1.2; text-wrap: balance; }
+h1, h2, h3 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
+h1, h2 { font-family: var(--titulo); color: var(--bronce); }
 img, svg { display: block; max-width: 100%; }
 [hidden] { display: none !important; }
 button, input, textarea { font: inherit; color: inherit; }
-button { cursor: pointer; border-radius: 2px; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-button:disabled { cursor: not-allowed; opacity: .45; }
-a { color: var(--marfil); text-underline-offset: .2em; }
-:focus-visible { outline: 2px solid var(--marfil); outline-offset: 3px; }
+button { cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+button:disabled { cursor: not-allowed; opacity: .4; }
+a { color: var(--bronce); text-underline-offset: .2em; }
+:focus-visible { outline: 2px solid var(--bronce); outline-offset: 3px; }
 .solo-lector { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
-/* ---------- Portada ---------- */
-.portada { max-width: var(--ancho); margin: 0 auto; padding: 1.5rem var(--margen) 1.75rem; text-align: center; }
-/* lighten y la máscara funden el fondo del PNG con el de la página */
-.portada img { width: min(100%, 27rem); height: auto; margin: 0 auto 1.25rem; mix-blend-mode: lighten;
+/* ---------- Portada: la noche del logo ---------- */
+.portada { padding: 1.25rem var(--margen) .75rem; background: var(--noche); color: var(--marfil); text-align: center; }
+/* lighten y la máscara funden el fondo del PNG con el de la portada */
+.portada img { width: min(86%, 23rem); height: auto; margin: 0 auto 1rem; mix-blend-mode: lighten;
   mask: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent) intersect, linear-gradient(transparent, #000 5%, #000 95%, transparent); }
-.portada p { max-width: 34ch; margin: 0 auto; font-size: 1.25rem; line-height: 1.4; text-wrap: balance; }
+.portada p { max-width: 40ch; margin: 0 auto; line-height: 1.45; text-wrap: balance; }
 
-/* ---------- Cordillera: un cerro por categoría, la estrella marca la actual ---------- */
+/* ---------- Cordillera: cerros nevados contra la noche; la estrella marca la categoría ---------- */
 .cordillera {
   position: sticky;
   top: 0;
   z-index: 10;
   display: flex;
   overflow-x: auto;
-  padding-top: 1rem;
-  background: var(--noche);
+  padding-top: var(--cielo);
+  background: linear-gradient(var(--noche) calc(var(--cielo) + var(--alto-cerro) - 2px), var(--nieve) 0);
   border-bottom: 1px solid var(--linea);
   scrollbar-width: none;
 }
 .cordillera::-webkit-scrollbar { display: none; }
-.cordillera a {
-  flex: 1 0 auto;
-  min-width: 7.25rem;
-  padding: 0 .9rem .6rem;
-  color: var(--crema-suave);
-  text-align: center;
-  text-decoration: none;
-  white-space: nowrap;
-}
+.cordillera a { flex: 1 0 auto; min-width: 7.25rem; padding: 0 .9rem .7rem; color: var(--piedra); line-height: 1.3; text-align: center; text-decoration: none; white-space: nowrap; }
 .cordillera a:focus-visible { outline-offset: -3px; }
-.cordillera a[aria-current] { color: var(--marfil); font-weight: 700; }
-.cordillera a svg { width: calc(100% + 1.8rem); max-width: none; height: var(--alto-cerro); margin: 0 -.9rem .2rem; }
-.cordillera a path { fill: none; stroke: var(--dorado); stroke-width: 1.5; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
-.cordillera a path.nieve { fill: var(--crema); stroke: none; }
-.cordillera .estrella {
-  position: absolute;
-  left: -.625rem;
-  top: -.4rem;
-  width: 1.25rem;
-  height: 1.25rem;
-  pointer-events: none;
-  transition: transform 600ms var(--salida);
-}
+.cordillera a[aria-current] { color: var(--noche); font-weight: 700; }
+/* medio píxel de traslape: sin él se ve la unión entre cerros */
+.cordillera a svg { width: calc(100% + 1.8rem + 1px); max-width: none; height: var(--alto-cerro); margin: 0 calc(-.9rem - .5px); }
+.cordillera .nieve { fill: var(--nieve); }
+.cordillera .filo { fill: none; stroke: var(--dorado); stroke-width: 1.5; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.cordillera .estrella { position: absolute; left: -.625rem; top: -.35rem; width: 1.25rem; height: 1.25rem; pointer-events: none; transition: transform 600ms var(--salida); }
 .estrella path { fill: var(--ambar); }
 
 /* ---------- Carta ---------- */
 .carta { max-width: var(--ancho); margin: 0 auto; padding: 0 var(--margen) 7rem; }
-.carta section { padding-top: 2.5rem; }
-.carta section:last-child { min-height: 60svh; } /* permite que la última categoría llegue a marcarse */
-.carta h2 { color: var(--dorado); font-size: 1.75rem; margin-bottom: .75rem; }
+.carta section { padding-top: 2rem; }
+.carta section:last-child { min-height: calc(100svh - 25rem); } /* deja que la última categoría llegue a marcarse (300 px en App.jsx, menos el margen inferior) */
+.carta h2 { margin-bottom: .5rem; font-size: 1.5rem; }
 .lista { list-style: none; }
-.producto { display: flex; gap: 1rem; padding: .8rem 0; }
-.producto__foto { flex: none; width: 88px; height: 88px; object-fit: cover; border-radius: 2px; }
+.producto { display: flex; gap: 1rem; padding: .7rem 0; }
+.producto__foto { flex: none; width: 72px; height: 72px; object-fit: cover; border-radius: 12px; }
 .producto__cuerpo { flex: 1; min-width: 0; }
 .renglon { display: flex; align-items: baseline; gap: .5rem; }
-.renglon h3 { font-size: 1.1875rem; }
-.puntos { flex: 1; min-width: 1rem; border-bottom: 2px dotted var(--linea); }
-.precio { color: var(--dorado); font-weight: 700; font-size: 1.1875rem; font-variant-numeric: tabular-nums; }
+.renglon h3 { font-size: 1.125rem; font-weight: 700; }
+.puntos { flex: 1; min-width: 1rem; border-bottom: 2px dotted #d9cba4; }
+.precio { color: var(--bronce); font-size: 1.125rem; font-weight: 700; font-variant-numeric: tabular-nums; }
 .producto__desc { max-width: 60ch; font-size: .9375rem; }
-.producto__pie { display: flex; align-items: center; justify-content: space-between; gap: .75rem; min-height: 2.75rem; margin-top: .25rem; color: var(--crema-suave); font-size: .9375rem; }
-.producto--agotado :is(h3, .precio, img) { opacity: .55; }
-.agotado { color: var(--ambar); font-weight: 700; }
+.producto__pie { display: flex; align-items: center; justify-content: space-between; gap: .75rem; min-height: 2.75rem; color: var(--piedra); font-size: .9375rem; }
+.producto--agotado :is(h3, .precio) { color: var(--piedra); font-weight: 400; }
+.producto--agotado img { filter: grayscale(1); opacity: .6; }
+.agotado { font-weight: 700; }
 
-.agregar { min-height: 2.75rem; padding: 0 1.1rem; border: 1px solid var(--dorado); background: none; color: var(--marfil); font-weight: 700; font-size: 1.0625rem; }
-.agregar:hover { background: var(--grafito); }
-.paso { display: inline-flex; align-items: center; border: 1px solid var(--dorado); border-radius: 2px; color: var(--marfil); }
-.paso button { width: 2.75rem; height: 2.75rem; border: 0; background: none; font-size: 1.375rem; line-height: 1; }
-.paso button:hover:enabled { background: var(--grafito); }
+/* Sumar y restar: el + queda quieto y el resto se abre hacia la izquierda */
+.paso { display: inline-flex; align-items: center; flex: none; border-radius: 999px; color: var(--noche); }
+.paso--elegido, .fila .paso { background: var(--marfil); }
+.paso button { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; padding: 0; border: 0; border-radius: 50%; background: none; font-size: 1.5rem; line-height: 1; }
+.paso .paso__mas { background: var(--marfil); color: var(--bronce); transition: background-color 160ms, color 160ms; }
+.paso--elegido .paso__mas, .paso .paso__mas:hover:enabled { background: var(--dorado); color: var(--noche); }
+.paso button:active:enabled { transform: scale(.92); }
 .paso output { min-width: 1.75rem; text-align: center; font-size: 1.0625rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.agregar { min-height: 2.75rem; padding: 0 1.25rem; border: 1px solid var(--dorado); border-radius: 999px; background: none; color: var(--bronce); font-weight: 700; }
+.agregar:hover { background: var(--marfil); }
 .estado { padding: 3rem 0; text-align: center; }
 .estado .agregar { margin-top: 1rem; }
-.pie { max-width: var(--ancho); margin: 0 auto; padding: 1.5rem var(--margen) 7rem; border-top: 1px solid var(--linea); color: var(--crema-suave); }
+.pie { max-width: var(--ancho); margin: 0 auto; padding: 1.5rem var(--margen) 7rem; border-top: 1px solid var(--linea); color: var(--piedra); }
 .carta:has(+ .pie) { padding-bottom: 2rem; }
 
 /* ---------- Barra del pedido ---------- */
@@ -113,86 +108,76 @@ a { color: var(--marfil); text-underline-offset: .2em; }
   align-items: center;
   gap: .6rem;
   width: 100%;
-  max-width: 30rem;
+  max-width: 28rem;
   min-height: 3.5rem;
   margin: 0 auto;
-  padding: 0 1.1rem;
+  padding: 0 1.5rem;
   border: 0;
+  border-radius: 999px;
   background: var(--dorado);
   color: var(--noche);
   font-weight: 700;
-  font-size: 1.125rem;
+  font-size: 1.0625rem;
+  box-shadow: 0 0 0 4px var(--nieve);
 }
-.barra__cuenta { min-width: 1.75rem; padding: 0 .4rem; border-radius: 1rem; background: var(--noche); color: var(--ambar); text-align: center; font-variant-numeric: tabular-nums; }
+.barra__cuenta { min-width: 1.75rem; padding: 0 .4rem; border-radius: 1rem; background: var(--marfil); text-align: center; font-variant-numeric: tabular-nums; }
 .barra__total { margin-left: auto; font-variant-numeric: tabular-nums; }
-
-.barra__ajuste { pointer-events: auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; max-width: 30rem; margin: 0 auto .5rem; padding: .25rem 1.1rem; border: 1px solid var(--ambar); background: var(--grafito); color: var(--ambar); font-weight: 700; line-height: 1.3; }
+.barra__ajuste { pointer-events: auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; max-width: 28rem; margin: 0 auto .6rem; padding: .25rem 1.25rem; border: 1px solid var(--cobre); border-radius: 12px; background: var(--nieve); color: var(--cobre); font-weight: 700; line-height: 1.3; }
 
 /* ---------- Pedido ---------- */
 html:has(dialog[open]) { overflow: hidden; }
-.pedido {
-  width: 100%;
-  max-width: 100%;
-  max-height: 92dvh;
-  margin: auto 0 0;
-  padding: 0;
-  border: 0;
-  border-top: 1px solid var(--dorado);
-  background: var(--grafito);
-  color: var(--crema);
-}
+.pedido { width: 100%; max-width: 100%; max-height: 92dvh; margin: auto 0 0; padding: 0; border: 0; border-radius: 20px 20px 0 0; background: var(--nieve); color: var(--noche); }
 .pedido[open] { animation: subir 380ms var(--salida); }
-.pedido::backdrop { background: rgb(0 0 0 / .7); }
+.pedido::backdrop { background: rgb(6 11 15 / .5); }
 @keyframes subir { from { transform: translateY(100%); } }
 .pedido__hoja { padding: 0 var(--margen) calc(1.5rem + env(safe-area-inset-bottom)); }
 .pedido__hoja, .pedido form { display: grid; gap: 1.1rem; }
-.pedido__cabeza { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; padding: .75rem 0; background: var(--grafito); border-bottom: 1px solid var(--linea); }
-.pedido h2 { color: var(--dorado); font-size: 1.5rem; }
-.pedido h3 { font-size: 1.1875rem; }
-.cerrar, .vaciar { min-height: 2.75rem; padding: 0 .25rem; border: 0; background: none; color: var(--crema); text-decoration: underline; text-underline-offset: .2em; }
-.vaciar { justify-self: center; color: var(--crema-suave); }
-.lineas { list-style: none; display: grid; gap: .9rem; }
-.lineas li { display: grid; grid-template-columns: 1fr auto; gap: .75rem; align-items: center; line-height: 1.3; }
+.pedido__cabeza { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; padding: .75rem 0; background: var(--nieve); border-bottom: 1px solid var(--linea); }
+.pedido h2 { font-size: 1.375rem; }
+.pedido h3 { font-size: 1.0625rem; }
+.cerrar, .vaciar { min-height: 2.75rem; padding: 0 .25rem; border: 0; background: none; color: var(--bronce); text-decoration: underline; text-underline-offset: .2em; }
+.vaciar { justify-self: center; color: var(--piedra); }
+.lineas { list-style: none; display: grid; gap: 1rem; }
+.lineas li { display: grid; grid-template-columns: 1fr auto auto; gap: .75rem; align-items: center; line-height: 1.3; }
 .lineas p { text-wrap: balance; }
+.lineas__nombre { font-weight: 700; }
 .lineas .precio { font-size: 1.0625rem; }
-.total { display: flex; justify-content: space-between; padding-top: .9rem; border-top: 1px solid var(--linea); color: var(--marfil); font-weight: 700; font-size: 1.25rem; font-variant-numeric: tabular-nums; }
-.nota { color: var(--crema-suave); font-size: .9375rem; }
-.aviso { color: var(--ambar); font-weight: 700; }
+.total { display: flex; justify-content: space-between; padding-top: .9rem; border-top: 1px solid var(--linea); font-weight: 700; font-size: 1.1875rem; font-variant-numeric: tabular-nums; }
+.nota { color: var(--piedra); font-size: .9375rem; }
+.aviso { color: var(--cobre); font-weight: 700; }
 .aviso:empty { display: none; }
 .entrega { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; min-width: 0; margin: 0; padding: 0; border: 0; }
 .entrega legend { margin-bottom: .4rem; padding: 0; }
 .entrega label { position: relative; }
 .entrega input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-.entrega span { display: grid; place-items: center; min-height: 3rem; border: 1px solid var(--linea); border-radius: 2px; }
-.entrega input:checked + span { border-color: var(--dorado); background: var(--noche); color: var(--marfil); font-weight: 700; }
-.entrega input:focus-visible + span { outline: 2px solid var(--marfil); outline-offset: 3px; }
-.campo { display: grid; gap: .3rem; }
-.campo :is(input, textarea) { width: 100%; min-height: 3rem; padding: .6rem .8rem; border: 1px solid #746645; border-radius: 2px; background: var(--noche); color: var(--marfil); resize: vertical; }
-.campo ::placeholder { color: #958d74; }
-.enviar { display: grid; place-items: center; min-height: 3.5rem; text-decoration: none; border-radius: 2px; border: 0; background: var(--dorado); color: var(--noche); font-weight: 700; font-size: 1.125rem; }
+.entrega span { display: grid; place-items: center; min-height: 3rem; border: 1px solid var(--borde-campo); border-radius: 12px; }
+.entrega input:checked + span { border-color: var(--dorado); background: var(--marfil); box-shadow: inset 0 0 0 1px var(--dorado); font-weight: 700; }
+.entrega input:focus-visible + span { outline: 2px solid var(--bronce); outline-offset: 3px; }
+.campo { display: grid; gap: .3rem; min-width: 0; }
+.campos-dos { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+.campo :is(input, textarea) { width: 100%; min-height: 3rem; padding: .6rem .85rem; border: 1px solid var(--borde-campo); border-radius: 12px; background: #fff; resize: vertical; }
+.campo ::placeholder { color: #767065; }
+.enviar { display: grid; place-items: center; min-height: 3.5rem; border: 0; border-radius: 999px; background: var(--dorado); color: var(--noche); font-weight: 700; font-size: 1.0625rem; text-decoration: none; }
 .transferencia { display: grid; gap: .9rem; }
 .transferencia dl { display: grid; gap: .4rem; margin: 0; }
 .transferencia dl div { display: flex; justify-content: space-between; gap: 1rem; }
-.transferencia dt { color: var(--crema-suave); }
-.transferencia dd { margin: 0; color: var(--marfil); font-weight: 700; text-align: right; overflow-wrap: anywhere; user-select: all; }
+.transferencia dt { color: var(--piedra); }
+.transferencia dd { margin: 0; font-weight: 700; text-align: right; overflow-wrap: anywhere; user-select: all; }
 
 @media (min-width: 64rem) {
-  .pedido { width: 28rem; height: 100dvh; max-height: 100dvh; margin: 0 0 0 auto; border-top: 0; border-left: 1px solid var(--dorado); }
+  :root { --ancho: 62rem; --alto-cerro: 3.5rem; }
+  .lista { display: grid; grid-template-columns: 1fr 1fr; column-gap: 4rem; }
+  .pedido { width: 28rem; height: 100dvh; max-height: 100dvh; margin: 0 0 0 auto; border-radius: 0; }
   .pedido__hoja { min-height: 100%; align-content: start; }
   .pedido[open] { animation-name: entrar; }
   @keyframes entrar { from { transform: translateX(100%); } }
-
-  :root { --ancho: 64rem; }
-  .cordillera { justify-content: center; }
-  .cordillera a { flex: 0 1 13rem; }
-  .lista { display: grid; grid-template-columns: 1fr 1fr; column-gap: 4rem; }
 }
 
 /* ---------- Panel ---------- */
 .admin { max-width: 44rem; margin: 0 auto; padding: 1rem var(--margen) 6rem; }
-.admin h1 { color: var(--dorado); font-size: 1.5rem; }
-.admin h2 { color: var(--dorado); font-size: 1.25rem; margin: 2rem 0 .5rem; }
-.admin h3 { font-size: 1.0625rem; }
+.admin h1 { font-size: 1.5rem; }
+.admin h2 { font-size: 1.25rem; margin: 2rem 0 .5rem; }
+.admin h3 { font-size: 1.0625rem; font-weight: 700; }
 .admin ul { list-style: none; }
 .admin__login { display: grid; gap: 1rem; max-width: 24rem; margin: 3rem auto; }
 .admin__cabeza { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
@@ -209,18 +194,18 @@ html:has(dialog[open]) { overflow: hidden; }
   padding: .9rem 0;
   border-bottom: 1px solid var(--linea);
 }
-.fila--oculta :is(h3, .nota) { opacity: .6; }
+.fila--oculta h3 { color: var(--piedra); }
 .fila__nombre { grid-area: nombre; }
-.fila__foto { grid-area: foto; position: relative; display: grid; gap: .25rem; place-items: center; min-height: 4rem; border: 1px dashed #746645; border-radius: 2px; color: var(--crema-suave); font-size: .8125rem; line-height: 1.2; text-align: center; cursor: pointer; }
+.fila__foto { grid-area: foto; position: relative; display: grid; gap: .25rem; place-items: center; min-height: 4rem; border: 1px dashed var(--borde-campo); border-radius: 12px; overflow: hidden; color: var(--piedra); font-size: .8125rem; line-height: 1.2; text-align: center; cursor: pointer; }
 .fila__foto img { width: 100%; height: 4rem; object-fit: cover; }
 .fila__foto input { position: absolute; inset: 0; width: 100%; opacity: 0; cursor: pointer; }
-.fila__foto:focus-within { outline: 2px solid var(--marfil); outline-offset: 2px; }
+.fila__foto:focus-within { outline: 2px solid var(--bronce); outline-offset: 2px; }
 .fila .paso { grid-area: stock; justify-self: start; }
 .fila .paso input, .fila__precio input { width: 3rem; min-height: 2.75rem; border: 0; background: none; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; }
 .fila__precio { grid-area: precio; display: flex; align-items: center; gap: .25rem; }
-.fila__precio input { width: 4.75rem; border: 1px solid #746645; border-radius: 2px; background: var(--grafito); }
+.fila__precio input { width: 4.75rem; border: 1px solid var(--borde-campo); border-radius: 12px; background: #fff; }
 .fila__visible { grid-area: visible; display: grid; justify-items: center; gap: .15rem; min-width: 2.75rem; font-size: .875rem; }
-.fila__visible input { width: 1.5rem; height: 1.5rem; margin: 0; accent-color: var(--dorado); }
+.fila__visible input { width: 1.5rem; height: 1.5rem; margin: 0; accent-color: var(--bronce); }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

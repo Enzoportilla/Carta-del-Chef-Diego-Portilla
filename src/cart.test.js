@@ -48,7 +48,7 @@ test('teléfono chileno a formato internacional', () => {
   for (const t of ['', undefined, '123', 'abc', '+54 9 1234 5678', '9123456789']) assert.equal(cart.telefonoInternacional(t), null)
 })
 
-const datos = { entrega: 'delivery', nombre: ' Ana Pérez ', telefono: '9 1234 5678', direccion: 'Los Aromos 12', comuna: 'Ñuñoa', referencias: 'portón negro', comentario: '  ' }
+const datos = { entrega: 'delivery', nombre: ' Ana ', apellido: ' Pérez ', telefono: '9 1234 5678', direccion: 'Los Aromos 12', comuna: 'Ñuñoa', referencias: 'portón negro', comentario: '  ' }
 const res = cart.resumen?.({ 'pan-arabe': 2 }, [p('pan-arabe', 2000, 5, 'Pan árabe', '5 unidades de 70 g')])
 
 test('mensaje de delivery lleva detalle, total, entrega, pago y teléfono', () => {
@@ -59,7 +59,7 @@ test('mensaje de delivery lleva detalle, total, entrega, pago y teléfono', () =
   assert.match(msg, /Entrega: delivery a Los Aromos 12, Ñuñoa \(portón negro\)/)
   assert.match(msg, /Pago: transferencia bancaria/)
   assert.match(msg, /Teléfono: \+56912345678/)
-  assert.doesNotMatch(msg, /Comentario|undefined|null/)
+  assert.doesNotMatch(msg, /Comentario|undefined|null|envío|cuesta/)
 })
 
 test('mensaje de retiro no incluye la dirección guardada', () => {

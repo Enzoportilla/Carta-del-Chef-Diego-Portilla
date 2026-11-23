@@ -20,6 +20,11 @@
 - Títulos y nombres de producto: *Cinzel* 600.
 - Texto y precios: *Lato* 400 y 700.
 
+## Uso en la web
+- Portada negra con el logo; el resto sobre blanco nieve (`#FFFEFA`), con marfil en controles y dorado en botones.
+- Texto dorado sobre fondo claro: usar bronce `#7A5B2B` (el dorado del logo no tiene contraste suficiente).
+- Menú de categorías: cerros nevados contra la noche; la estrella marca la categoría actual.
+
 ## Notas
 - El logo tiene fondo negro (no transparente): usarlo sobre fondos oscuros.
 - Si se necesita versión con fondo transparente o en vector (SVG), pedirla al cliente.

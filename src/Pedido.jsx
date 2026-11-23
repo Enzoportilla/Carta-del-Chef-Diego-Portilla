@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { NEGOCIO, TRANSFERENCIA } from './data.js'
-import { enlaceWhatsApp, mensajePedido, nombreLinea, precio, resumen, telefonoInternacional } from './cart.js'
+import { enlaceWhatsApp, mensajePedido, precio, resumen, telefonoInternacional } from './cart.js'
 import { guardar, leer } from './almacen.js'
 import Paso from './Paso.jsx'
 
 const CLAVE = 'chef-diego-pedido-datos'
-const VACIO = { entrega: 'retiro', nombre: '', telefono: '', direccion: '', comuna: '', referencias: '', comentario: '' }
+const COORDINAR = 'El pago y la entrega se coordinan con el Chef en la conversación.'
+const VACIO = { entrega: 'retiro', nombre: '', apellido: '', telefono: '', direccion: '', comuna: '', referencias: '', comentario: '' }
 
 function leerDatos() {
   const previo = leer(CLAVE) ?? {}
@@ -38,14 +39,14 @@ function Confirmacion({ enviado, onCopiar, onVaciar, aviso }) {
       <p>Envía el mensaje para que el chef reciba tu pedido.</p>
       {/* Enlace real y no window.open: funciona también dentro de Instagram y Facebook. */}
       <a className="enviar" href={enviado.url} target="_blank" rel="noopener">Enviar por WhatsApp</a>
-      {datos ? (
+      <p className="nota">{COORDINAR}</p>
+      {datos && (
         <section className="transferencia" aria-labelledby="transferencia-titulo">
           <h3 id="transferencia-titulo">Datos para transferir</h3>
           <dl>{datos.map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
-          {enviado.delivery && <p className="nota">El costo de envío no está incluido: se confirma por WhatsApp.</p>}
           <button type="button" className="agregar" onClick={() => onCopiar(datos.map((d) => d.join(': ')).join('\n'), 'Datos copiados.')}>Copiar datos</button>
         </section>
-      ) : <p>El chef te dará los datos para transferir por WhatsApp. Total: {precio(enviado.total)}</p>}
+      )}
       <p className="aviso" role="status">{aviso}</p>
       <button type="button" className="vaciar" onClick={onVaciar}>Vaciar pedido</button>
     </>
@@ -80,7 +81,7 @@ export default function Pedido({ abierto, onCerrar, res, ajuste, carrito, onCamb
     if (!actuales) return setAviso('No pudimos confirmar el stock. Revisa tu conexión y vuelve a intentarlo.')
     const ahora = resumen(carrito, actuales)
     if (mensajePedido(ahora, datos) !== mensaje) return setAviso('Cambió la carta y actualizamos tu pedido. Revísalo y vuelve a confirmar.')
-    setEnviado({ url: enlaceWhatsApp(NEGOCIO.whatsapp, mensaje), total: ahora.total, delivery: datos.entrega === 'delivery' })
+    setEnviado({ url: enlaceWhatsApp(NEGOCIO.whatsapp, mensaje), total: ahora.total })
     dialogo.current.scrollTo(0, 0)
   }
 
@@ -101,7 +102,7 @@ export default function Pedido({ abierto, onCerrar, res, ajuste, carrito, onCamb
             {ajuste && !aviso && <p className="aviso" role="status">Cambió el stock: actualizamos tu pedido.</p>}
             {res.lineas.length === 0 ? (
               <>
-                <p>Tu pedido está vacío. Vuelve a la carta y toca Agregar.</p>
+                <p>Tu pedido está vacío. Vuelve a la carta y toca + en lo que quieras pedir.</p>
                 <p className="aviso" role="status">{aviso}</p>
               </>
             ) : (
@@ -110,9 +111,10 @@ export default function Pedido({ abierto, onCerrar, res, ajuste, carrito, onCamb
                   {res.lineas.map(({ producto, cantidad, subtotal }) => (
                     <li key={producto.id}>
                       <div>
-                        <p>{nombreLinea(producto)}</p>
-                        <p className="precio">{precio(subtotal)}</p>
+                        <p className="lineas__nombre">{producto.nombre}</p>
+                        <p className="nota">{producto.formato}</p>
                       </div>
+                      <p className="precio">{precio(subtotal)}</p>
                       <Paso producto={producto} cantidad={cantidad} onCambiar={onCambiar} />
                     </li>
                   ))}
@@ -130,14 +132,16 @@ export default function Pedido({ abierto, onCerrar, res, ajuste, carrito, onCamb
                 </fieldset>
                 {datos.entrega === 'delivery' ? (
                   <>
-                    <p className="nota">El costo de envío se confirma por WhatsApp.</p>
                     <label className="campo"><span>Dirección</span><input autoComplete="street-address" {...texto('direccion')} /></label>
                     <label className="campo"><span>Comuna</span><input autoComplete="address-level2" {...texto('comuna')} /></label>
                     <label className="campo"><span>Referencias (opcional)</span><input {...campo('referencias')} /></label>
                   </>
-                ) : <p className="nota">{NEGOCIO.retiro || 'El lugar y la hora de retiro se coordinan por WhatsApp.'}</p>}
+                ) : NEGOCIO.retiro && <p className="nota">{NEGOCIO.retiro}</p>}
 
-                <label className="campo"><span>Nombre</span><input autoComplete="name" {...texto('nombre')} /></label>
+                <div className="campos-dos">
+                  <label className="campo"><span>Nombre</span><input autoComplete="given-name" {...texto('nombre')} /></label>
+                  <label className="campo"><span>Apellido</span><input autoComplete="family-name" {...texto('apellido')} /></label>
+                </div>
                 <label className="campo"><span>Teléfono</span>
                   <input required type="tel" autoComplete="tel" placeholder="9 1234 5678" {...campo('telefono')}
                     ref={(el) => el?.setCustomValidity(telefonoInternacional(datos.telefono) ? '' : 'Escribe un celular chileno, por ejemplo 9 1234 5678')} />
@@ -148,7 +152,7 @@ export default function Pedido({ abierto, onCerrar, res, ajuste, carrito, onCamb
                 <button type="submit" className="enviar" disabled={!NEGOCIO.whatsapp || enviando}>{enviando ? 'Confirmando stock…' : 'Confirmar pedido'}</button>
                 {!NEGOCIO.whatsapp && <p className="nota">El envío por WhatsApp aún no está disponible. Puedes copiar el mensaje.</p>}
                 <button type="button" className="agregar" onClick={() => formulario.current.reportValidity() && copiarYAvisar(mensaje, 'Mensaje copiado.')}>Copiar mensaje</button>
-                <p className="nota">Pagas por transferencia bancaria.</p>
+                <p className="nota">{COORDINAR}</p>
                 <button type="button" className="vaciar" onClick={onVaciar}>Vaciar pedido</button>
               </>
             )}
